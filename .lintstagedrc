@@ -1,0 +1,18 @@
+{
+  "*.{js,ts,jsx,tsx}": [
+    "eslint --fix --quiet",
+    "git add"
+  ],
+  "*.css": [
+    "git add"
+  ],
+  "*.html": [
+    "git add"
+  ],
+  "*.md": [
+    "git add"
+  ],
+  "*.json": [
+    "git add"
+  ]
+}
