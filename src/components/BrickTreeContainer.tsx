@@ -1,11 +1,12 @@
 import React from "react";
-import { Button, ITreeNode, Tree, Classes, ButtonGroup } from '@blueprintjs/core';
+import { Button, ITreeNode, Tree, ButtonGroup } from '@blueprintjs/core';
 import { HOOK_NAME } from '../shared';
+import { PropTree } from './PropTree';
 
 export function BrickTreeContainer(): React.ReactElement {
   const [tree, setTree] = React.useState<any[]>([]);
   const [selectedId, setSelectedId] = React.useState<number>();
-  const [props, setProps] = React.useState<Record<string, any>>({});
+  const [properties, setProperties] = React.useState<Record<string, any>>({});
 
   const handleRefresh = React.useCallback((): void => {
     chrome.devtools.inspectedWindow.eval(
@@ -19,7 +20,7 @@ export function BrickTreeContainer(): React.ReactElement {
         }
 
         setTree(result);
-        setProps({});
+        setProperties({});
       }
     );
   }, []);
@@ -39,7 +40,7 @@ export function BrickTreeContainer(): React.ReactElement {
   const handleNodeClick = React.useCallback((node: ITreeNode<any>) => {
     setSelectedId(node.id as number);
     console.log(node.nodeData.properties);
-    setProps(node.nodeData.properties);
+    setProperties(node.nodeData.properties);
   }, []);
 
   const handleNodeDoubleClick = React.useCallback((node: ITreeNode<any>) => {
@@ -77,15 +78,6 @@ export function BrickTreeContainer(): React.ReactElement {
     return tree.map(walk);
   }, [tree, selectedId]);
 
-  const propNodes = React.useMemo<ITreeNode<any>[]>(() => {
-    return Object.entries(props).map(([key, value]) => {
-      return {
-        id: key,
-        label: <span className={Classes.RUNNING_TEXT}><code>{`${key}`}</code>: <code>{`${value}`}</code></span>
-      }
-    });
-  }, [props]);
-
   return (
     <div>
       <div style={{paddingBottom: 10}}>
@@ -97,7 +89,7 @@ export function BrickTreeContainer(): React.ReactElement {
       </div>
       <div style={{display: "flex", justifyContent: "space-between"}}>
         <Tree contents={nodes} onNodeClick={handleNodeClick} onNodeDoubleClick={handleNodeDoubleClick} onNodeMouseEnter={handleNodeMouseEnter} onNodeMouseLeave={handleNodeMouseLeave} />
-        <Tree contents={propNodes} />
+        <PropTree properties={properties} />
       </div>
     </div>
   );
