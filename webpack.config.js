@@ -1,6 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyPlugin = require("copy-webpack-plugin");
+// const CopyPlugin = require("copy-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
@@ -16,7 +16,7 @@ module.exports = {
     hook: "./src/hook",
   },
   output: {
-    path: path.join(__dirname, "dist"),
+    path: path.join(__dirname, "extension/build"),
     filename: "[name].js"
   },
   resolve: {
@@ -55,7 +55,9 @@ module.exports = {
     ]
   },
   plugins: [
-    // new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanStaleWebpackAssets: false
+    }),
     new HtmlWebpackPlugin({
       title: "Brick Next Developer Tools Panel",
       // inject: false,
@@ -68,9 +70,5 @@ module.exports = {
       chunks: ["devtools"],
       filename: "devtools.html"
     }),
-    new CopyPlugin([
-      "manifest.json",
-      "icon.png"
-    ]),
   ]
 };

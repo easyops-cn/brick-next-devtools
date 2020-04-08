@@ -1,0 +1,1 @@
+export const HOOK_NAME = "__BRICK_NEXT_DEVTOOLS_HOOK__";

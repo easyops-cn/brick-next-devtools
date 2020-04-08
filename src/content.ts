@@ -5,4 +5,4 @@ function injectScript(file: string): void {
   script.parentNode.removeChild(script);
 }
 
-injectScript('hook.js');
+injectScript('build/hook.js');

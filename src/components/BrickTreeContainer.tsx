@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, ITreeNode, Tree, Classes, ButtonGroup } from '@blueprintjs/core';
+import { HOOK_NAME } from '../shared';
 
 export function BrickTreeContainer(): React.ReactElement {
   const [tree, setTree] = React.useState<any[]>([]);
@@ -8,7 +9,7 @@ export function BrickTreeContainer(): React.ReactElement {
 
   const handleRefresh = React.useCallback((): void => {
     chrome.devtools.inspectedWindow.eval(
-      "window.__BRICK_NEXT_DEVTOOLS_HOOK__.getMainBricks()",
+      `window.${HOOK_NAME}.getMainBricks()`,
       function(result: any, error) {
         if (error) {
           console.error(error);
@@ -25,13 +26,13 @@ export function BrickTreeContainer(): React.ReactElement {
 
   const handleInspectElement = React.useCallback((): void => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(${selectedId})),void 0`
+      `inspect(window.${HOOK_NAME}.getBrickByUid(${selectedId})),void 0`
     );
   }, [selectedId]);
 
   const handleInspectConstructor = React.useCallback((): void => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(${selectedId}).constructor),void 0`
+      `inspect(window.${HOOK_NAME}.getBrickByUid(${selectedId}).constructor),void 0`
     );
   }, [selectedId]);
 
@@ -43,19 +44,19 @@ export function BrickTreeContainer(): React.ReactElement {
 
   const handleNodeDoubleClick = React.useCallback((node: ITreeNode<any>) => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(${node.id})),void 0`
+      `inspect(window.${HOOK_NAME}.getBrickByUid(${node.id})),void 0`
     );
   }, []);
 
   const handleNodeMouseEnter = React.useCallback((node: ITreeNode<any>) => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.showBox(${node.id})),void 0`
+      `inspect(window.${HOOK_NAME}.showBox(${node.id})),void 0`
     );
   }, []);
 
   const handleNodeMouseLeave = React.useCallback((node: ITreeNode<any>) => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.hideBox(${node.id})),void 0`
+      `inspect(window.${HOOK_NAME}.hideBox(${node.id})),void 0`
     );
   }, []);
 
