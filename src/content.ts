@@ -5,4 +5,6 @@ function injectScript(file: string): void {
   script.parentNode.removeChild(script);
 }
 
-injectScript('build/hook.js');
+if (document.contentType === "text/html") {
+  injectScript('build/hook.js');
+}

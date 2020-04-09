@@ -1,4 +1,5 @@
 import { HOOK_NAME } from "./shared";
+import { RichBrickData } from './libs/interfaces';
 
 function injectHook(): void {
   if (Object.prototype.hasOwnProperty.call(window, HOOK_NAME)) {
@@ -9,17 +10,11 @@ function injectHook(): void {
   function uniqueId(): number {
     return uniqueIdCounter += 1;
   }
-  // const uidListByMountPoint = new Map<string, number[]>();
   const uidToBrick = new Map<number, HTMLElement>();
   const brickToUid = new WeakMap();
 
   function inject(brick: HTMLElement, mountPoint: string): void {
     const uid = uniqueId();
-    // if (uidListByMountPoint.has(mountPoint)) {
-    //   uidListByMountPoint.get(mountPoint).push(uid);
-    // } else {
-    //   uidListByMountPoint.set(mountPoint, [uid]);
-    // }
     uidToBrick.set(uid, brick);
     brickToUid.set(brick, uid);
   }
@@ -28,14 +23,7 @@ function injectHook(): void {
     return uidToBrick.get(uid);
   }
 
-  // function getBricksByMountPoint(mountPoint: string): string[] {
-  //   return uidListByMountPoint.has(mountPoint) ?
-  //   uidListByMountPoint.get(mountPoint).map(uid =>
-  //     uidToBrick.get(uid).tagName.toLowerCase()
-  //   ) : [];
-  // }
-
-  function walk(node: any): any {
+  function walk(node: any): RichBrickData {
     const brick = node.currentElement;
     const element = brick.element;
     const tagName = element.tagName.toLowerCase();
@@ -58,17 +46,16 @@ function injectHook(): void {
     };
   }
 
-  function getMainBricks(): any {
+  function getMainBricks(): RichBrickData[] {
+    uniqueIdCounter = 0;
     const mountPoint = document.querySelector("#main-mount-point") as any;
     return mountPoint.$$rootBricks.map(walk);
   }
 
-  const uidToBox = new Map();
+  let lastBox: HTMLElement;
 
   function showBox(uid: number): void {
-    // Array.from(uidToBox.values()).forEach(element => {
-    //   element.remove()
-    // });
+    hideBox();
     const element = uidToBrick.get(uid);
     const div = document.createElement("div");
     div.style.position = "absolute";
@@ -80,22 +67,18 @@ function injectHook(): void {
     div.style.width = `${box.width}px`;
     div.style.height = `${box.height}px`;
     document.body.appendChild(div);
-    uidToBox.set(uid, div);
+    lastBox = div;
   }
 
-  function hideBox(uid: number): void {
-    if (uidToBox.has(uid)) {
-      uidToBox.get(uid).remove();
+  function hideBox(): void {
+    if (lastBox) {
+      lastBox.remove();
+      lastBox = undefined;
     }
   }
 
   const hook = {
-    // uidListByMountPoint,
-    // uidToBrick,
-    // brickToUid,
-    // inject,
     getBrickByUid,
-    // getBricksByMountPoint,
     getMainBricks,
     showBox,
     hideBox
@@ -105,10 +88,6 @@ function injectHook(): void {
 
   Object.defineProperty(hook, "pageHasBricks", {
     get: function() {
-      // if (pageHasBricks == undefined) {
-      //   pageHasBricks = Array.isArray((document.querySelector("#main-mount-point") as any)?.$$rootBricks);
-      // }
-      // return pageHasBricks;
       return Array.isArray((document.querySelector("#main-mount-point") as any)?.$$rootBricks);
     }
   });

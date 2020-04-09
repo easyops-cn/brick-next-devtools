@@ -1,19 +1,22 @@
 import React from "react";
 import { Classes, ITreeNode, Tree } from '@blueprintjs/core';
-
-export interface PropTreeProps {
-  properties: Record<string, any>;
-}
+import { useSelectedBrickContext } from '../libs/SelectedBrickContext';
 
 interface UniqueContext {
   uniqueId: number;
 }
 
-export function PropTree(props: PropTreeProps): React.ReactElement {
+export function PropView(): React.ReactElement {
+  const { selectedBrick } = useSelectedBrickContext();
+
+  if (!selectedBrick) {
+    return null;
+  }
+
   const ctx: UniqueContext = {
     uniqueId: 0
   };
-  const propNodes = Object.entries(props.properties).map(([key, value]) => PropNodeFactory(key, value, ctx));
+  const propNodes = Object.entries(selectedBrick.properties).map(([key, value]) => PropNodeFactory(key, value, ctx));
 
   return <Tree contents={propNodes} />
 };
