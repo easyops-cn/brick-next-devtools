@@ -1,4 +1,4 @@
-import { HOOK_NAME } from "./shared";
+import { HOOK_NAME, MESSAGE_SOURCE_DEVTOOLS } from "./shared";
 
 let panelCreated = false;
 
@@ -22,14 +22,44 @@ function createPanelForBricks(): void {
 
       panelCreated = true;
       clearInterval(loadCheckInterval);
+      let panelWindow: Window;
+
+      const tabId = chrome.devtools.inspectedWindow.tabId;
+
+      const port = chrome.runtime.connect({
+        name: '' + tabId,
+      });
+
+      port.onMessage.addListener((message) => {
+        panelWindow?.postMessage({
+          source: MESSAGE_SOURCE_DEVTOOLS,
+          payload: {
+            type: "port",
+            message
+          }
+        }, "*");
+      });
 
       chrome.devtools.panels.create("🧩 Bricks",
         "",
         "build/panel.html",
         function(panel) {
-          // code invoked on panel creation
+          panel.onShown.addListener((win) => {
+            panelWindow = win;
+          });
         }
       );
+
+      chrome.devtools.network.onNavigated.removeListener(createPanelForBricks);
+
+      chrome.devtools.network.onNavigated.addListener(function onNavigated() {
+        panelWindow?.postMessage({
+          source: MESSAGE_SOURCE_DEVTOOLS,
+          payload: {
+            type: "navigated"
+          }
+        }, "*")
+      });
     }
   );
 }

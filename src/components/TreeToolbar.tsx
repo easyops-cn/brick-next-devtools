@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, ButtonGroup } from '@blueprintjs/core';
-import { HOOK_NAME } from '../shared';
+import { HOOK_NAME, MESSAGE_SOURCE_HOOK, MESSAGE_SOURCE_DEVTOOLS } from '../shared';
 import { useBrickTreeContext } from '../libs/BrickTreeContext';
 import { useSelectedBrickContext } from '../libs/SelectedBrickContext';
 import { RichBrickData } from '../libs/interfaces';
@@ -29,6 +29,19 @@ export function TreeToolbar(): React.ReactElement {
   React.useEffect(() => {
     handleRefresh();
   }, []);
+
+  React.useEffect(() => {
+    function onMessage(event: MessageEvent): void {
+      if (event.data?.source === MESSAGE_SOURCE_DEVTOOLS && event.data.payload?.type === "port") {
+        const message = event.data.payload.message;
+        if (message?.source === MESSAGE_SOURCE_HOOK && message.payload?.type === "rendered") {
+          handleRefresh();
+        }
+      }
+    }
+    window.addEventListener("message", onMessage);
+    return (): void => window.removeEventListener("message", onMessage);
+  }, [handleRefresh]);
 
   return (
     <div className="tree-toolbar">

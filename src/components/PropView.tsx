@@ -1,6 +1,7 @@
 import React from "react";
 import { Classes, ITreeNode, Tree } from '@blueprintjs/core';
 import { useSelectedBrickContext } from '../libs/SelectedBrickContext';
+import { HOOK_NAME } from '../shared';
 
 interface UniqueContext {
   uniqueId: number;
@@ -8,20 +9,39 @@ interface UniqueContext {
 
 export function PropView(): React.ReactElement {
   const { selectedBrick } = useSelectedBrickContext();
+  const [propNodes, setPropNodes] = React.useState<ITreeNode<void>[]>([]);
+
+  React.useEffect(() => {
+    if (selectedBrick) {
+      chrome.devtools.inspectedWindow.eval(
+        `window.${HOOK_NAME}.getBrickProperties(${selectedBrick.uid})`,
+        function(result: Record<string, any>, error) {
+          if (error) {
+            console.error(error);
+            // document.querySelector("#log-result").textContent =
+            //   (error.isException ? 'exception: ' + error.value : 'error: ' + error.description);
+            return;
+          }
+
+          const ctx: UniqueContext = {
+            uniqueId: 0
+          };
+          setPropNodes(
+            Object.entries(result).map(([key, value]) => PropNodeFactory(key, value, ctx))
+          );
+        }
+      );
+    }
+  }, [selectedBrick]);
 
   if (!selectedBrick) {
     return null;
   }
 
-  const ctx: UniqueContext = {
-    uniqueId: 0
-  };
-  const propNodes = Object.entries(selectedBrick.properties).map(([key, value]) => PropNodeFactory(key, value, ctx));
-
   return <Tree contents={propNodes} />
 };
 
-function PropNodeFactory(key: string | number, value: any, ctx: UniqueContext): ITreeNode {
+function PropNodeFactory(key: string | number, value: any, ctx: UniqueContext): ITreeNode<void> {
   const childNodes = Array.isArray(value)
     ? value.map((v, i) => PropNodeFactory(i, v, ctx))
     : typeof value === "object" && value !== null

@@ -21,13 +21,13 @@ export function BrickTree(): React.ReactElement {
 
   const handleNodeMouseEnter = React.useCallback((node: ITreeNode<BrickData>) => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.${HOOK_NAME}.showBox(${node.id})),void 0`
+      `inspect(window.${HOOK_NAME}.showInspectBox(${node.id})),void 0`
     );
   }, []);
 
   const handleNodeMouseLeave = React.useCallback((node: ITreeNode<BrickData>) => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.${HOOK_NAME}.hideBox(${node.id})),void 0`
+      `inspect(window.${HOOK_NAME}.hideInspectBox(${node.id})),void 0`
     );
   }, []);
 
@@ -42,7 +42,7 @@ export function BrickTree(): React.ReactElement {
         nodeData: {
           uid: node.uid,
           tagName: node.tagName,
-          properties: node.properties,
+          // properties: node.properties,
         },
         childNodes: node.children.map(walk)
       }
