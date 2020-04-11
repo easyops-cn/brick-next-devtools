@@ -1,18 +1,10 @@
 {
   "*.{js,ts,jsx,tsx}": [
     "eslint --fix --quiet",
-    "git add"
+    "prettier --write"
   ],
-  "*.css": [
-    "git add"
-  ],
-  "*.html": [
-    "git add"
-  ],
-  "*.md": [
-    "git add"
-  ],
-  "*.json": [
-    "git add"
-  ]
+  "*.css": "prettier --write",
+  "*.html": "prettier --write",
+  "*.md": "prettier --write",
+  "*.json": "prettier --write"
 }

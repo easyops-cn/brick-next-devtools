@@ -1,7 +1,7 @@
 import React from "react";
-import { Classes, ITreeNode, Tree } from '@blueprintjs/core';
-import { useSelectedBrickContext } from '../libs/SelectedBrickContext';
-import { HOOK_NAME } from '../shared';
+import { Classes, ITreeNode, Tree, Tag } from "@blueprintjs/core";
+import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
+import { HOOK_NAME } from "../shared";
 
 interface UniqueContext {
   uniqueId: number;
@@ -15,19 +15,19 @@ export function PropView(): React.ReactElement {
     if (selectedBrick) {
       chrome.devtools.inspectedWindow.eval(
         `window.${HOOK_NAME}.getBrickProperties(${selectedBrick.uid})`,
-        function(result: Record<string, any>, error) {
+        function (result: Record<string, any>, error) {
           if (error) {
-            console.error(error);
-            // document.querySelector("#log-result").textContent =
-            //   (error.isException ? 'exception: ' + error.value : 'error: ' + error.description);
+            console.error("getBrickProperties()", error);
             return;
           }
 
           const ctx: UniqueContext = {
-            uniqueId: 0
+            uniqueId: 0,
           };
           setPropNodes(
-            Object.entries(result).map(([key, value]) => PropNodeFactory(key, value, ctx))
+            Object.entries(result).map(([key, value]) =>
+              PropNodeFactory(key, value, ctx)
+            )
           );
         }
       );
@@ -38,10 +38,23 @@ export function PropView(): React.ReactElement {
     return null;
   }
 
-  return <Tree contents={propNodes} />
-};
+  return (
+    <div className="prop-view source-code">
+      <div className="scroll-container">
+        <div style={{ padding: 5 }}>
+          <Tag minimal>properties</Tag>
+        </div>
+        <Tree contents={propNodes} />
+      </div>
+    </div>
+  );
+}
 
-function PropNodeFactory(key: string | number, value: any, ctx: UniqueContext): ITreeNode<void> {
+function PropNodeFactory(
+  key: string | number,
+  value: any,
+  ctx: UniqueContext
+): ITreeNode<void> {
   const childNodes = Array.isArray(value)
     ? value.map((v, i) => PropNodeFactory(i, v, ctx))
     : typeof value === "object" && value !== null
@@ -49,11 +62,15 @@ function PropNodeFactory(key: string | number, value: any, ctx: UniqueContext): 
     : [];
   return {
     id: ctx.uniqueId += 1,
-    label: <span className={Classes.RUNNING_TEXT}><code>{`${key}`}</code>: <code>{PropValueFactory(value)}</code></span>,
+    label: (
+      <span>
+        <code>{`${key}`}</code>: <code>{PropValueFactory(value)}</code>
+      </span>
+    ),
     hasCaret: childNodes.length > 0,
     isExpanded: true,
-    childNodes
-  }
+    childNodes,
+  };
 }
 
 function PropValueFactory(value: any): string {

@@ -1,58 +1,76 @@
-const ports: Record<string, any> = {};
+// Pipe messages between content-script and devtools.
 
-chrome.runtime.onConnect.addListener(function(port) {
+const ports: Record<string, Record<string, chrome.runtime.Port>> = {};
+
+chrome.runtime.onConnect.addListener(function (port) {
   console.log("onConnect", port);
   let tab = null;
   let name = null;
   if (isNumeric(port.name)) {
     tab = port.name;
-    name = 'devtools';
-    // installContentScript(+port.name);
+    name = "devtools";
   } else {
     tab = port.sender.tab.id;
-    name = 'content-script';
+    name = "content-script";
   }
 
   if (!ports[tab]) {
-    ports[tab] = {
-      devtools: null,
-      'content-script': null,
-    };
+    ports[tab] = {};
   }
   ports[tab][name] = port;
 
-  if (ports[tab].devtools && ports[tab]['content-script']) {
-    doublePipe(ports[tab].devtools, ports[tab]['content-script']);
-  }
+  pipeMessages(tab);
 });
 
 function isNumeric(str: string): boolean {
-  return +str + '' === str;
+  return +str + "" === str;
 }
 
-/* function installContentScript(tabId: number) {
-  chrome.tabs.executeScript(
-    tabId,
-    {file: '/build/contentScript.js'},
-    function() {},
-  );
-} */
+function pipeMessages(tab: string | number): void {
+  const { devtools, "content-script": contentScript } = ports[tab];
+  if (!devtools || !contentScript) {
+    return;
+  }
+  devtools.onMessage.addListener(listenDevtools);
+  contentScript.onMessage.addListener(listenContentScript);
+  devtools.onDisconnect.addListener(shutdownDevtools);
+  contentScript.onDisconnect.addListener(shutdownContentScript);
 
-function doublePipe(one, two) {
-  one.onMessage.addListener(lOne);
-  function lOne(message) {
+  function listenDevtools(message: any): void {
+    contentScript.postMessage(message);
+  }
+
+  function listenContentScript(message: any): void {
+    devtools.postMessage(message);
+  }
+
+  function shutdownDevtools(): void {
+    devtools.onMessage.removeListener(listenDevtools);
+    contentScript.disconnect();
+  }
+
+  function shutdownContentScript(): void {
+    contentScript.onMessage.removeListener(listenContentScript);
+    devtools.disconnect();
+    ports[tab] = {};
+  }
+}
+
+/* function doublePipe(one: chrome.runtime.Port, two: chrome.runtime.Port): void {
+  one.onMessage.addListener(listenOne);
+  two.onMessage.addListener(listenTwo);
+  one.onDisconnect.addListener(shutdown);
+  two.onDisconnect.addListener(shutdown);
+  function listenOne(message: any): void {
     two.postMessage(message);
   }
-  two.onMessage.addListener(lTwo);
-  function lTwo(message) {
+  function listenTwo(message: any): void {
     one.postMessage(message);
   }
-  function shutdown() {
-    one.onMessage.removeListener(lOne);
-    two.onMessage.removeListener(lTwo);
+  function shutdown(): void {
+    one.onMessage.removeListener(listenOne);
+    two.onMessage.removeListener(listenTwo);
     one.disconnect();
     two.disconnect();
   }
-  one.onDisconnect.addListener(shutdown);
-  two.onDisconnect.addListener(shutdown);
-}
+} */

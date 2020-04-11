@@ -1,3 +1,13 @@
+:root {
+  --pane-border-color: #ccc;
+  --brick-label-color: rgb(136, 18, 128);
+}
+
+.bp3-dark {
+  --pane-border-color: #444;
+  --brick-label-color: rgb(93, 176, 215);
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -21,20 +31,62 @@ body {
   display: flex;
 }
 
-.tree-wrapper {
-  flex: 0 0 50%;
-  overflow: auto;
+.layout * {
+  box-sizing: border-box;
+}
+
+.tree-wrapper,
+.selected-brick-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
 }
 
 .selected-brick-wrapper {
-  flex: 1 1 50%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border-left: 1px solid #666;
+  border-left: 1px solid var(--pane-border-color);
 }
 
 .tree-toolbar,
 .selected-brick-toolbar {
   padding: 10px;
-  border-bottom: 1px solid #666;
+  border-bottom: 1px solid var(--pane-border-color);
+  flex: 0 0 50px;
+  overflow: hidden;
+}
+
+.brick-tree,
+.prop-view {
+  flex: 1 0 auto;
+  overflow: hidden;
+  height: calc(100vh - 50px);
+}
+
+.scroll-container {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.selected-brick-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.source-code {
+  font-family: Menlo, monospace;
+}
+
+.brick-title {
+  color: var(--brick-label-color);
+  font-size: 12px;
+  font-family: Menlo, monospace;
+}
+
+.brick-label .bp3-popover-wrapper {
+  margin-left: 10px;
+}
+
+.bp3-tree-node-selected > .bp3-tree-node-content .brick-label {
+  color: #f5f8fa;
 }

@@ -1,7 +1,8 @@
 import React from "react";
-import { Button, ButtonGroup } from '@blueprintjs/core';
-import { HOOK_NAME } from '../shared';
-import { useSelectedBrickContext } from '../libs/SelectedBrickContext';
+import classNames from "classnames";
+import { Button, ButtonGroup, Classes } from "@blueprintjs/core";
+import { HOOK_NAME } from "../shared";
+import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
 
 export function SelectedBrickToolbar(): React.ReactElement {
   const { selectedBrick } = useSelectedBrickContext();
@@ -20,9 +21,22 @@ export function SelectedBrickToolbar(): React.ReactElement {
 
   return (
     <div className="selected-brick-toolbar">
+      <span
+        className={classNames("brick-title", Classes.TEXT_OVERFLOW_ELLIPSIS)}
+      >
+        {selectedBrick?.tagName}
+      </span>
       <ButtonGroup>
-        <Button text="Inspect Element" onClick={handleInspectElement} disabled={!selectedBrick} />
-        <Button text="Inspect Code" onClick={handleInspectCode} disabled={!selectedBrick} />
+        <Button
+          text="Inspect Element"
+          onClick={handleInspectElement}
+          disabled={!selectedBrick}
+        />
+        <Button
+          text="Source Code"
+          onClick={handleInspectCode}
+          disabled={!selectedBrick}
+        />
       </ButtonGroup>
     </div>
   );

@@ -1,9 +1,9 @@
 import React from "react";
-import { RichBrickData } from './interfaces';
+import { BricksByMountPoint } from "./interfaces";
 
 export interface ContextOfBrickTree {
-  tree?: RichBrickData[];
-  setTree?: React.Dispatch<RichBrickData[]>;
+  tree?: BricksByMountPoint;
+  setTree?: React.Dispatch<BricksByMountPoint>;
 }
 
 export const BrickTreeContext = React.createContext<ContextOfBrickTree>({});

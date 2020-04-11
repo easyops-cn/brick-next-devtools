@@ -1,30 +1,35 @@
 import { MESSAGE_SOURCE_HOOK } from "./shared";
 
 function injectScript(file: string): void {
-  const script = document.createElement('script');
+  const script = document.createElement("script");
   script.src = chrome.runtime.getURL(file);
   document.documentElement.appendChild(script);
   script.parentNode.removeChild(script);
 }
 
-if (document.contentType === "text/html") {
-  injectScript('build/hook.js');
+let port: chrome.runtime.Port;
 
-  const port = chrome.runtime.connect({
-    name: 'content-script',
+function initPort(): void {
+  port = chrome.runtime.connect({
+    name: "content-script",
   });
-  // port.onMessage.addListener((message) => {
+  // console.log("content script connected ✅");
+  port.onDisconnect.addListener(() => {
+    // console.log("content script disconnected 🚫");
+    port = null;
+  });
+}
 
-  // });
-  // port.onDisconnect.addListener(handleDisconnect);
+if (document.contentType === "text/html") {
+  injectScript("build/hook.js");
+
   window.addEventListener("message", (event: MessageEvent) => {
     if (event.source === window) {
       if (event.data?.source === MESSAGE_SOURCE_HOOK) {
-        /* if (event.data.payload?.type === "rendered") {
-          // chrome.runtime.sendMessage({});
-          port.postMessage(event.data.payload);
-        } */
-        port.postMessage(event.data);
+        if (!port) {
+          initPort();
+        }
+        port?.postMessage(event.data);
       }
     }
   });

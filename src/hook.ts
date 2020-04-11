@@ -1,5 +1,12 @@
 import { HOOK_NAME, MESSAGE_SOURCE_HOOK } from "./shared";
-import { RichBrickData } from './libs/interfaces';
+import {
+  RichBrickData,
+  BrickNode,
+  BrickElement,
+  BrickElementConstructor,
+  MountPointElement,
+  BricksByMountPoint,
+} from "./libs/interfaces";
 
 function injectHook(): void {
   if (Object.prototype.hasOwnProperty.call(window, HOOK_NAME)) {
@@ -8,48 +15,72 @@ function injectHook(): void {
 
   let uniqueIdCounter = 0;
   function uniqueId(): number {
-    return uniqueIdCounter += 1;
+    return (uniqueIdCounter += 1);
   }
-  let uidToBrick = new Map<number, HTMLElement>();
-  let brickToUid = new WeakMap<HTMLElement, number>();
+  let uidToBrick = new Map<number, BrickElement>();
+  // let brickToUid = new WeakMap<BrickElement, number>();
 
-  function getBrickByUid(uid: number): HTMLElement {
+  function getBrickByUid(uid: number): BrickElement {
     return uidToBrick.get(uid);
   }
 
-  function walk(node: any): RichBrickData {
-    const brick = node.currentElement;
-    const element = brick.element;
-    const tagName = element.tagName.toLowerCase();
+  function walk(node: BrickNode): RichBrickData {
+    const element = node.$$brick?.element;
+    if (!element) {
+      return;
+    }
 
     const uid = uniqueId();
     uidToBrick.set(uid, element);
-    brickToUid.set(element, uid);
+    // brickToUid.set(element, uid);
 
     return {
       uid,
-      tagName,
-      children: node.children.map(walk)
+      tagName: element.tagName.toLowerCase(),
+      children: (node.children?.map(walk) ?? []).filter(Boolean),
     };
   }
 
   function getMainBricks(): RichBrickData[] {
     uniqueIdCounter = 0;
     uidToBrick = new Map();
-    brickToUid = new WeakMap();
-    const mountPoint = document.querySelector("#main-mount-point") as any;
-    return mountPoint.$$rootBricks.map(walk);
+    // brickToUid = new WeakMap();
+    const mountPoint =
+      document.querySelector("#main-mount-point") as MountPointElement;
+    return (mountPoint?.$$rootBricks?.map(walk) ?? []).filter(Boolean);
+  }
+
+  function getBricks(): BricksByMountPoint {
+    uniqueIdCounter = 0;
+    uidToBrick = new Map();
+    // brickToUid = new WeakMap();
+    return {
+      main: getBricksByMountPoint("#main-mount-point"),
+      bg: getBricksByMountPoint("#bg-mount-point"),
+    };
+  }
+
+  function getBricksByMountPoint(mountPoint: string): RichBrickData[] {
+    const element = document.querySelector(mountPoint) as MountPointElement;
+    return (element?.$$rootBricks?.map(walk) ?? []).filter(Boolean);
   }
 
   function getBrickProperties(uid: number): Record<string, any> {
     let properties: Record<string, any> = {};
-    const element = uidToBrick.get(uid) as any;
-    if (element?.$$typeof === "brick") {
-      const props: string[] = Array.from(element.constructor._dev_only_definedProperties || []);
-      properties = Object.fromEntries(props.map((propName) => [
-        propName,
-        element[propName]
-      ]))
+    const element = uidToBrick.get(uid);
+    if (["brick", "provider", "custom-element"].includes(element?.$$typeof)) {
+      const props: string[] = Array.from(
+        (element.constructor as BrickElementConstructor)
+          ._dev_only_definedProperties || []
+      );
+      properties = Object.fromEntries(
+        props
+          .sort()
+          .map((propName) => [
+            propName,
+            element[propName as keyof BrickElement],
+          ])
+      );
     }
     return properties;
   }
@@ -83,31 +114,36 @@ function injectHook(): void {
   }
 
   function emit(payload: any): void {
-    window.postMessage({
-      source: MESSAGE_SOURCE_HOOK,
-      payload
-    }, "*");
+    window.postMessage(
+      {
+        source: MESSAGE_SOURCE_HOOK,
+        payload,
+      },
+      "*"
+    );
   }
 
   const hook = {
     getBrickByUid,
+    getBricks,
     getMainBricks,
     getBrickProperties,
     showInspectBox,
     hideInspectBox,
-    emit
+    emit,
   };
 
   Object.defineProperty(hook, "pageHasBricks", {
-    get: function() {
-      return Array.isArray((document.querySelector("#main-mount-point") as any)?.$$rootBricks);
-    }
+    get: function () {
+      return !!(window as any).BRICK_NEXT_VERSIONS;
+      // return Array.isArray((document.querySelector("#main-mount-point") as MountPointElement)?.$$rootBricks);
+    },
   });
 
   Object.defineProperty(window, HOOK_NAME, {
-    get: function(){
+    get: function () {
       return hook;
-    }
+    },
   });
 }
 
