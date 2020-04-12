@@ -6,6 +6,7 @@ import {
   BrickElementConstructor,
   MountPointElement,
   BricksByMountPoint,
+  BrickInfo,
 } from "./libs/interfaces";
 
 function injectHook(): void {
@@ -65,14 +66,14 @@ function injectHook(): void {
     return (element?.$$rootBricks?.map(walk) ?? []).filter(Boolean);
   }
 
-  function getBrickProperties(uid: number): Record<string, any> {
+  function getBrickInfo(uid: number): BrickInfo {
     let properties: Record<string, any> = {};
+    let events: string[];
     const element = uidToBrick.get(uid);
     if (["brick", "provider", "custom-element"].includes(element?.$$typeof)) {
-      const props: string[] = Array.from(
+      const props: string[] =
         (element.constructor as BrickElementConstructor)
-          ._dev_only_definedProperties || []
-      );
+          ._dev_only_definedProperties || [];
       properties = Object.fromEntries(
         props
           .sort()
@@ -81,8 +82,11 @@ function injectHook(): void {
             element[propName as keyof BrickElement],
           ])
       );
+      events = Array.isArray(element.$$eventListeners)
+        ? element.$$eventListeners.map((item) => item[0])
+        : [];
     }
-    return properties;
+    return { properties, events };
   }
 
   let inspectBox: HTMLElement;
@@ -95,7 +99,8 @@ function injectHook(): void {
       inspectBox = document.createElement("div");
       inspectBox.style.position = "absolute";
       inspectBox.style.zIndex = "1000000";
-      inspectBox.style.backgroundColor = "rgba(0,0,0,0.2)";
+      inspectBox.style.pointerEvents = "none";
+      inspectBox.style.backgroundColor = "rgba(120, 170, 210, 0.7)";
     }
     const box = element.getBoundingClientRect();
     inspectBox.style.top = `${box.top + window.scrollY}px`;
@@ -127,7 +132,7 @@ function injectHook(): void {
     getBrickByUid,
     getBricks,
     getMainBricks,
-    getBrickProperties,
+    getBrickInfo,
     showInspectBox,
     hideInspectBox,
     emit,

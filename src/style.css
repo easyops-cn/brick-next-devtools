@@ -1,22 +1,34 @@
 :root {
   --pane-border-color: #ccc;
   --brick-label-color: rgb(136, 18, 128);
+  --caret-color: #999;
+  --source-code-color: rgb(33, 33, 33);
+  --source-code-name: rgb(136, 19, 145);
+  --source-code-primitive: rgb(28, 0, 207);
+  --source-code-string: rgb(196, 26, 22);
+  --source-code-gray: rgb(127, 127, 127);
+  --source-code-object-prop-name: #565656;
 }
 
 .bp3-dark {
   --pane-border-color: #444;
   --brick-label-color: rgb(93, 176, 215);
+  --caret-color: #727272;
+  --source-code-name: rgb(227, 110, 236);
+  --source-code-primitive: hsl(252, 100%, 75%);
+  --source-code-color: rgb(213, 213, 213);
+  --source-code-string: rgb(233, 63, 59);
+  --source-code-gray: rgb(128, 128, 128);
+  --source-code-object-prop-name: rgb(169, 169, 169);
 }
 
 body {
   margin: 0;
   padding: 0;
-  /* display: flex; */
 }
 
 #root {
   display: flex;
-  /* flex: 1; */
   width: 100%;
   position: fixed;
   top: 0;
@@ -52,6 +64,14 @@ body {
   border-bottom: 1px solid var(--pane-border-color);
   flex: 0 0 50px;
   overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tree-toolbar .bp3-control {
+  margin-bottom: 0;
+  font-size: 12px;
 }
 
 .brick-tree,
@@ -65,12 +85,6 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
   height: 100%;
-}
-
-.selected-brick-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
 }
 
 .source-code {
@@ -87,6 +101,60 @@ body {
   margin-left: 10px;
 }
 
-.bp3-tree-node-selected > .bp3-tree-node-content .brick-label {
+.bp3-tree-node-selected > .bp3-tree-node-content .brick-title {
   color: #f5f8fa;
+}
+
+.prop-tree {
+  font-size: 12px;
+  list-style: none;
+  padding-left: 14px;
+  margin: 0;
+  color: var(--source-code-color);
+}
+
+.prop-item-label {
+  cursor: default;
+}
+
+.prop-item-label > .bp3-icon {
+  vertical-align: middle;
+  color: var(--caret-color);
+}
+
+.prop-name {
+  color: var(--source-code-name);
+}
+
+.prop-value-string,
+.prop-value-item-string {
+  color: var(--source-code-string);
+}
+
+.prop-value-function,
+.prop-value-item-function {
+  font-style: italic;
+}
+
+.prop-value-item-primitive,
+.prop-value-primitive {
+  color: var(--source-code-primitive);
+}
+
+.prop-value-nil,
+.prop-value-item-nil {
+  color: var(--source-code-gray);
+}
+
+.prop-value-expanded {
+  font-style: italic;
+}
+
+.prop-value-object-prop-name {
+  color: var(--source-code-object-prop-name);
+  font-style: italic;
+}
+
+.prop-value-array-length {
+  color: var(--source-code-gray);
 }

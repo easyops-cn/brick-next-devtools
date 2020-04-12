@@ -23,6 +23,7 @@ export interface RuntimeBrick {
 
 export interface BrickElement extends HTMLElement {
   $$typeof?: "brick" | "custom-template";
+  $$eventListeners: [string, Function][];
 }
 
 export interface BrickElementConstructor extends Function {
@@ -31,6 +32,11 @@ export interface BrickElementConstructor extends Function {
 
 export interface MountPointElement extends HTMLElement {
   $$rootBricks?: BrickNode[];
+}
+
+export interface BrickInfo {
+  properties?: Record<string, any>;
+  events?: string[];
 }
 
 export type BrowserTheme = "dark" | "light";

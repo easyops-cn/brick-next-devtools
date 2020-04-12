@@ -1,6 +1,6 @@
 import React from "react";
 import classNames from "classnames";
-import { Button, ButtonGroup, Classes } from "@blueprintjs/core";
+import { Button, ButtonGroup, Classes, Tooltip } from "@blueprintjs/core";
 import { HOOK_NAME } from "../shared";
 import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
 
@@ -21,23 +21,36 @@ export function SelectedBrickToolbar(): React.ReactElement {
 
   return (
     <div className="selected-brick-toolbar">
-      <span
-        className={classNames("brick-title", Classes.TEXT_OVERFLOW_ELLIPSIS)}
-      >
-        {selectedBrick?.tagName}
-      </span>
-      <ButtonGroup>
-        <Button
-          text="Inspect Element"
-          onClick={handleInspectElement}
-          disabled={!selectedBrick}
-        />
-        <Button
-          text="Source Code"
-          onClick={handleInspectCode}
-          disabled={!selectedBrick}
-        />
-      </ButtonGroup>
+      {selectedBrick && (
+        <>
+          <span
+            className={classNames(
+              "brick-title",
+              Classes.TEXT_OVERFLOW_ELLIPSIS
+            )}
+          >
+            {selectedBrick?.tagName}
+          </span>
+          <ButtonGroup>
+            <Tooltip content="Inspect the brick element" hoverOpenDelay={300}>
+              <Button
+                icon="eye-open"
+                minimal
+                onClick={handleInspectElement}
+                disabled={!selectedBrick}
+              />
+            </Tooltip>
+            <Tooltip content="View the brick source code" hoverOpenDelay={300}>
+              <Button
+                icon="code"
+                minimal
+                onClick={handleInspectCode}
+                disabled={!selectedBrick}
+              />
+            </Tooltip>
+          </ButtonGroup>
+        </>
+      )}
     </div>
   );
 }

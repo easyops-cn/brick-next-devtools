@@ -7,12 +7,14 @@ import { BrickData, BricksByMountPoint } from "../libs/interfaces";
 import { SelectedBrickContext } from "../libs/SelectedBrickContext";
 import { BrowserThemeContext } from "../libs/BrowserTheme";
 import { CollapsedBrickIdsContext } from "../libs/CollapsedBrickIdsContext";
+import { ShowFullNameContext } from "../libs/ShowFullNameContext";
 
 export function Layout(): React.ReactElement {
   const [tree, setTree] = React.useState<BricksByMountPoint>();
   const [collapsedBrickIds, setCollapsedBrickIds] = React.useState<number[]>(
     []
   );
+  const [showFullName, setShowFullName] = React.useState<boolean>(false);
   const [selectedBrick, setSelectedBrick] = React.useState<BrickData>();
   const theme = chrome.devtools.panels.themeName === "dark" ? "dark" : "light";
 
@@ -23,29 +25,33 @@ export function Layout(): React.ReactElement {
       })}
     >
       <BrowserThemeContext.Provider value={theme}>
-        <BrickTreeContext.Provider
+        <SelectedBrickContext.Provider
           value={{
-            tree,
-            setTree,
+            selectedBrick,
+            setSelectedBrick,
           }}
         >
-          <CollapsedBrickIdsContext.Provider
+          <BrickTreeContext.Provider
             value={{
-              collapsedBrickIds,
-              setCollapsedBrickIds,
+              tree,
+              setTree,
             }}
           >
-            <SelectedBrickContext.Provider
+            <CollapsedBrickIdsContext.Provider
               value={{
-                selectedBrick,
-                setSelectedBrick,
+                collapsedBrickIds,
+                setCollapsedBrickIds,
               }}
             >
-              <TreeWrapper />
-              <SelectedBrickWrapper />
-            </SelectedBrickContext.Provider>
-          </CollapsedBrickIdsContext.Provider>
-        </BrickTreeContext.Provider>
+              <ShowFullNameContext.Provider
+                value={{ showFullName, setShowFullName }}
+              >
+                <TreeWrapper />
+              </ShowFullNameContext.Provider>
+            </CollapsedBrickIdsContext.Provider>
+          </BrickTreeContext.Provider>
+          <SelectedBrickWrapper />
+        </SelectedBrickContext.Provider>
       </BrowserThemeContext.Provider>
     </div>
   );

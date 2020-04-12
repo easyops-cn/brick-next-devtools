@@ -33,8 +33,8 @@ function pipeMessages(tab: string | number): void {
   }
   devtools.onMessage.addListener(listenDevtools);
   contentScript.onMessage.addListener(listenContentScript);
-  devtools.onDisconnect.addListener(shutdownDevtools);
-  contentScript.onDisconnect.addListener(shutdownContentScript);
+  devtools.onDisconnect.addListener(shutdown);
+  contentScript.onDisconnect.addListener(shutdown);
 
   function listenDevtools(message: any): void {
     contentScript.postMessage(message);
@@ -44,14 +44,11 @@ function pipeMessages(tab: string | number): void {
     devtools.postMessage(message);
   }
 
-  function shutdownDevtools(): void {
+  function shutdown(): void {
     devtools.onMessage.removeListener(listenDevtools);
-    contentScript.disconnect();
-  }
-
-  function shutdownContentScript(): void {
     contentScript.onMessage.removeListener(listenContentScript);
     devtools.disconnect();
+    contentScript.disconnect();
     ports[tab] = {};
   }
 }
