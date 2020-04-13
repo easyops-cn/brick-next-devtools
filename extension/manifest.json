@@ -3,21 +3,28 @@
 
   "name": "Brick Next Developer Tools",
   "description": "Adds Brick Next debugging tools to the Chrome Developer Tools.",
-  "version": "0.0.1",
+  "version": "0.1.0",
+
+  "icons": {
+    "128": "icons/128-production.png"
+  },
 
   "devtools_page": "build/devtools.html",
 
   "permissions": ["http://*/*", "https://*/*"],
 
   "background": {
-    "scripts": ["build/background.js"]
+    "scripts": ["build/background.js"],
+    "persistent": false
   },
 
-  "content_scripts": [{
-    "matches": ["<all_urls>"],
-    "js": ["build/content.js"],
-    "run_at": "document_start"
-  }],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["build/content.js"],
+      "run_at": "document_start"
+    }
+  ],
 
   "web_accessible_resources": [
     "build/devtools.js",

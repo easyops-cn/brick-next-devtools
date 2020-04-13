@@ -13,9 +13,7 @@ function initPort(): void {
   port = chrome.runtime.connect({
     name: "content-script",
   });
-  // console.log("content script connected ✅");
   port.onDisconnect.addListener(() => {
-    // console.log("content script disconnected 🚫");
     port = null;
   });
 }
