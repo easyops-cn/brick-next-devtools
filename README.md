@@ -1,8 +1,6 @@
-[![Travis Status](https://travis-ci.com/easyops-cn/brick-next-devtools.svg?branch=master)](https://travis-ci.com/easyops-cn/brick-next-devtools) [![Coverage Status](https://coveralls.io/repos/github/easyops-cn/brick-next-devtools/badge.svg?branch=master)](https://coveralls.io/github/easyops-cn/brick-next-devtools)
+# Brick Next Developer Tools [![Travis Status](https://travis-ci.com/easyops-cn/brick-next-devtools.svg?branch=master)](https://travis-ci.com/easyops-cn/brick-next-devtools) [![Coverage Status](https://coveralls.io/repos/github/easyops-cn/brick-next-devtools/badge.svg?branch=master)](https://coveralls.io/github/easyops-cn/brick-next-devtools)
 
-# Brick Next Developer Tools
-
-A Chrome extension for Brick Next developers.
+A Chrome devtools extension for Brick Next developers.
 
 ## Development
 
@@ -19,10 +17,22 @@ Follow [Official Tutorial](https://developer.chrome.com/extensions/getstarted), 
 npm test
 ```
 
-Testing a specified file in watch mode:
+To test a specified file:
+
+```
+npm test src/some-file.spec.ts
+```
+
+To test a specified file in watch mode:
 
 ```
 npm test src/some-file.spec.ts -- --watch
+```
+
+To test a specified file and collect coverage from related files only:
+
+```
+npm test src/some-file.spec.ts -- no-collect-coverage-from
 ```
 
 ## Publish
