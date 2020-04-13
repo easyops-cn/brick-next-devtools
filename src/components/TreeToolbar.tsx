@@ -17,6 +17,7 @@ export function TreeToolbar(): React.ReactElement {
     chrome.devtools.inspectedWindow.eval(
       `window.${HOOK_NAME} && window.${HOOK_NAME}.getBricks()`,
       function (result: BricksByMountPoint, error) {
+        // istanbul ignore if
         if (error) {
           console.error("getBricks()", error);
         }

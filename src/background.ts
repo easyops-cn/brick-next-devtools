@@ -3,7 +3,6 @@
 const ports: Record<string, Record<string, chrome.runtime.Port>> = {};
 
 chrome.runtime.onConnect.addListener(function (port) {
-  console.log("onConnect", port);
   let tab = null;
   let name = null;
   if (isNumeric(port.name)) {
@@ -52,22 +51,3 @@ function pipeMessages(tab: string | number): void {
     ports[tab] = {};
   }
 }
-
-/* function doublePipe(one: chrome.runtime.Port, two: chrome.runtime.Port): void {
-  one.onMessage.addListener(listenOne);
-  two.onMessage.addListener(listenTwo);
-  one.onDisconnect.addListener(shutdown);
-  two.onDisconnect.addListener(shutdown);
-  function listenOne(message: any): void {
-    two.postMessage(message);
-  }
-  function listenTwo(message: any): void {
-    one.postMessage(message);
-  }
-  function shutdown(): void {
-    one.onMessage.removeListener(listenOne);
-    two.onMessage.removeListener(listenTwo);
-    one.disconnect();
-    two.disconnect();
-  }
-} */

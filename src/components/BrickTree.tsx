@@ -87,24 +87,22 @@ export function BrickTree(): React.ReactElement {
   return (
     <div className="brick-tree source-code">
       <div className="scroll-container">
-        {Object.entries(bricksByMountPoint)
-          .filter((entry) => entry[1].length > 0)
-          .map(([mountPoint, nodes]) => (
-            <div key={mountPoint}>
-              <div style={{ padding: 5 }}>
-                <Tag minimal>{mountPoint}</Tag>
-              </div>
-              <Tree
-                contents={nodes}
-                onNodeClick={handleNodeClick}
-                // onNodeDoubleClick={handleNodeDoubleClick}
-                onNodeCollapse={handleNodeCollapse}
-                onNodeExpand={handleNodeExpand}
-                onNodeMouseEnter={handleNodeMouseEnter}
-                onNodeMouseLeave={handleNodeMouseLeave}
-              />
+        {Object.entries(bricksByMountPoint).map(([mountPoint, nodes]) => (
+          <div key={mountPoint}>
+            <div style={{ padding: 5 }}>
+              <Tag minimal>{mountPoint}</Tag>
             </div>
-          ))}
+            <Tree
+              contents={nodes}
+              onNodeClick={handleNodeClick}
+              // onNodeDoubleClick={handleNodeDoubleClick}
+              onNodeCollapse={handleNodeCollapse}
+              onNodeExpand={handleNodeExpand}
+              onNodeMouseEnter={handleNodeMouseEnter}
+              onNodeMouseLeave={handleNodeMouseLeave}
+            />
+          </div>
+        ))}
       </div>
     </div>
   );

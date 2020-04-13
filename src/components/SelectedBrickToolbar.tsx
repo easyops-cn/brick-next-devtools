@@ -29,24 +29,14 @@ export function SelectedBrickToolbar(): React.ReactElement {
               Classes.TEXT_OVERFLOW_ELLIPSIS
             )}
           >
-            {selectedBrick?.tagName}
+            {selectedBrick.tagName}
           </span>
           <ButtonGroup>
             <Tooltip content="Inspect the brick element" hoverOpenDelay={300}>
-              <Button
-                icon="eye-open"
-                minimal
-                onClick={handleInspectElement}
-                disabled={!selectedBrick}
-              />
+              <Button icon="eye-open" minimal onClick={handleInspectElement} />
             </Tooltip>
             <Tooltip content="View the brick source code" hoverOpenDelay={300}>
-              <Button
-                icon="code"
-                minimal
-                onClick={handleInspectCode}
-                disabled={!selectedBrick}
-              />
+              <Button icon="code" minimal onClick={handleInspectCode} />
             </Tooltip>
           </ButtonGroup>
         </>

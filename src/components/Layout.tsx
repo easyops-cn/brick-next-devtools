@@ -5,7 +5,7 @@ import { SelectedBrickWrapper } from "./SelectedBrickWrapper";
 import { BrickTreeContext } from "../libs/BrickTreeContext";
 import { BrickData, BricksByMountPoint } from "../libs/interfaces";
 import { SelectedBrickContext } from "../libs/SelectedBrickContext";
-import { BrowserThemeContext } from "../libs/BrowserTheme";
+import { BrowserThemeContext } from "../libs/BrowserThemeContext";
 import { CollapsedBrickIdsContext } from "../libs/CollapsedBrickIdsContext";
 import { ShowFullNameContext } from "../libs/ShowFullNameContext";
 

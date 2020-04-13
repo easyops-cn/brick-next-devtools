@@ -22,6 +22,10 @@
   },
   "parser": "@typescript-eslint/parser",
   "rules": {
+    "@typescript-eslint/explicit-function-return-type": [
+      "warn",
+      { "allowExpressions": true }
+    ],
     "@typescript-eslint/no-use-before-define": [
       "error",
       { "functions": false, "classes": false }

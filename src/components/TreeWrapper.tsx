@@ -1,6 +1,6 @@
 import React from "react";
-import { TreeToolbar } from './TreeToolbar';
-import { BrickTree } from './BrickTree';
+import { TreeToolbar } from "./TreeToolbar";
+import { BrickTree } from "./BrickTree";
 
 export function TreeWrapper(): React.ReactElement {
   return (

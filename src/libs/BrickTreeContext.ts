@@ -8,5 +8,6 @@ export interface ContextOfBrickTree {
 
 export const BrickTreeContext = React.createContext<ContextOfBrickTree>({});
 
+// istanbul ignore next
 export const useBrickTreeContext = (): ContextOfBrickTree =>
   React.useContext(BrickTreeContext);

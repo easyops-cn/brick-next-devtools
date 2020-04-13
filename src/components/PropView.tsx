@@ -7,6 +7,7 @@ import { BrickInfo } from "../libs/interfaces";
 
 // `Function`s can't be passed through `chrome.devtools.inspectedWindow.eval`.
 // Use a noop function to mock the event listener.
+// istanbul ignore next
 function noop(): void {
   // noop
 }
@@ -20,6 +21,7 @@ export function PropView(): React.ReactElement {
       chrome.devtools.inspectedWindow.eval(
         `window.${HOOK_NAME}.getBrickInfo(${selectedBrick.uid})`,
         function (result: BrickInfo, error) {
+          // istanbul ignore if
           if (error) {
             console.error("getBrickInfo()", error);
           }

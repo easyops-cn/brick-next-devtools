@@ -9,5 +9,6 @@ export const CollapsedBrickIdsContext = React.createContext<
   ContextOfCollapsedBrickIds
 >({});
 
+// istanbul ignore next
 export const useCollapsedBrickIdsContext = (): ContextOfCollapsedBrickIds =>
   React.useContext(CollapsedBrickIdsContext);

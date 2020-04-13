@@ -141,7 +141,6 @@ function injectHook(): void {
   Object.defineProperty(hook, "pageHasBricks", {
     get: function () {
       return !!(window as any).BRICK_NEXT_VERSIONS;
-      // return Array.isArray((document.querySelector("#main-mount-point") as MountPointElement)?.$$rootBricks);
     },
   });
 

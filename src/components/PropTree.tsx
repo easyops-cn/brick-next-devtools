@@ -116,7 +116,7 @@ export function ValueStringify({
     return (
       <>
         <span className="prop-value-punctuation">{'"'}</span>
-        <span className="prop-value-item-string">{value}</span>
+        <span className="prop-value-string">{value}</span>
         <span className="prop-value-punctuation">{'"'}</span>
       </>
     );
