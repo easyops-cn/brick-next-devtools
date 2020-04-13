@@ -1,3 +1,5 @@
+[![Travis Status](https://travis-ci.com/easyops-cn/brick-next-devtools.svg?branch=master)](https://travis-ci.com/easyops-cn/brick-next-devtools)
+
 # Brick Next Developer Tools
 
 A Chrome extension for Brick Next developers.
