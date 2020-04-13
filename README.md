@@ -1,4 +1,4 @@
-[![Travis Status](https://travis-ci.com/easyops-cn/brick-next-devtools.svg?branch=master)](https://travis-ci.com/easyops-cn/brick-next-devtools)
+[![Travis Status](https://travis-ci.com/easyops-cn/brick-next-devtools.svg?branch=master)](https://travis-ci.com/easyops-cn/brick-next-devtools) [![Coverage Status](https://coveralls.io/repos/github/easyops-cn/brick-next-devtools/badge.svg?branch=master)](https://coveralls.io/github/easyops-cn/brick-next-devtools)
 
 # Brick Next Developer Tools
 
