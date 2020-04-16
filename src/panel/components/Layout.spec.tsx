@@ -1,0 +1,129 @@
+import React from "react";
+import { act } from "react-dom/test-utils";
+import { shallow, mount } from "enzyme";
+import { Layout } from "./Layout";
+import { Storage } from "../libs/Storage";
+import { BricksPanel } from "./BricksPanel";
+import { EvaluationsPanel } from "./EvaluationsPanel";
+import { TransformationsPanel } from "./TransformationsPanel";
+import { MESSAGE_SOURCE_HOOK } from "../../shared/constants";
+import { useEvaluationsContext } from "../libs/EvaluationsContext";
+import { useTransformationsContext } from "../libs/TransformationsContext";
+
+function MockEvaluationsPanel(): React.ReactElement {
+  const { evaluations } = useEvaluationsContext();
+  return <div>EvaluationsPanel ({evaluations.length})</div>;
+}
+
+function MockTransformationsPanel(): React.ReactElement {
+  const { transformations } = useTransformationsContext();
+  return <div>TransformationsPanel ({transformations.length})</div>;
+}
+
+jest.mock("./BricksPanel", () => ({
+  BricksPanel: function BricksPanel(): React.ReactElement {
+    return <div>BricksPanel</div>;
+  },
+}));
+
+jest.mock("./EvaluationsPanel", () => ({
+  EvaluationsPanel: MockEvaluationsPanel,
+}));
+
+jest.mock("./TransformationsPanel", () => ({
+  TransformationsPanel: MockTransformationsPanel,
+}));
+
+const storageGetItem = jest.spyOn(Storage, "getItem");
+const storageSetItem = jest
+  .spyOn(Storage, "setItem")
+  .mockImplementation(() => void 0);
+
+const mockPanels: Record<string, any> = {};
+(window as any).chrome = {
+  devtools: {
+    panels: mockPanels,
+  },
+};
+
+describe("Layout", () => {
+  afterEach(() => {
+    mockPanels.themeName = undefined;
+    storageGetItem.mockReturnValue(null);
+    storageSetItem.mockClear();
+  });
+
+  it("should work as default theme", () => {
+    const wrapper = shallow(<Layout />);
+    expect(wrapper.hasClass("bp3-dark")).toBe(false);
+    expect(wrapper.find(BricksPanel).length).toBe(1);
+    expect(wrapper.find(EvaluationsPanel).length).toBe(0);
+    expect(wrapper.find(TransformationsPanel).length).toBe(0);
+  });
+
+  it("should work as dark theme", () => {
+    mockPanels.themeName = "dark";
+    const wrapper = shallow(<Layout />);
+    expect(wrapper.hasClass("bp3-dark")).toBe(true);
+  });
+
+  it("should work for bricks panel", () => {
+    const wrapper = mount(<Layout />);
+    expect(wrapper.text()).toBe("BricksPanel");
+    expect(storageSetItem).toBeCalledWith("selectedPanel", "Bricks");
+  });
+
+  it("should work for evaluations panel", () => {
+    storageGetItem.mockReturnValue("Evaluations");
+    const wrapper = mount(<Layout />);
+    expect(wrapper.text()).toBe("EvaluationsPanel (0)");
+    expect(storageSetItem).toBeCalledWith("selectedPanel", "Evaluations");
+  });
+
+  it("should work for transformations panel", () => {
+    storageGetItem.mockReturnValue("Transformations");
+    const wrapper = mount(<Layout />);
+    expect(wrapper.text()).toBe("TransformationsPanel (0)");
+    expect(storageSetItem).toBeCalledWith("selectedPanel", "Transformations");
+  });
+
+  it("should work for new evaluations", async () => {
+    storageGetItem.mockReturnValue("Evaluations");
+    const wrapper = mount(<Layout />);
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "evaluation",
+            payload: "good",
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(wrapper.text()).toBe("EvaluationsPanel (1)");
+    wrapper.unmount();
+  });
+
+  it("should work for new transformations", async () => {
+    storageGetItem.mockReturnValue("Transformations");
+    const wrapper = mount(<Layout />);
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "transformation",
+            payload: "good",
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(wrapper.text()).toBe("TransformationsPanel (1)");
+    wrapper.unmount();
+  });
+});

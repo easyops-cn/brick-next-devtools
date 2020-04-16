@@ -2,7 +2,7 @@ import {
   HOOK_NAME,
   MESSAGE_SOURCE_DEVTOOLS,
   MESSAGE_SOURCE_HOOK,
-} from "./shared";
+} from "./shared/constants";
 
 let panelCreated = false;
 
