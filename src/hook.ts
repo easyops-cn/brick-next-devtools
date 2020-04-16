@@ -42,21 +42,13 @@ function injectHook(): void {
     };
   }
 
-  function getMainBricks(): RichBrickData[] {
-    uniqueIdCounter = 0;
-    uidToBrick = new Map();
-    // brickToUid = new WeakMap();
-    const mountPoint =
-      document.querySelector("#main-mount-point") as MountPointElement;
-    return (mountPoint?.$$rootBricks?.map(walk) ?? []).filter(Boolean);
-  }
-
   function getBricks(): BricksByMountPoint {
     uniqueIdCounter = 0;
     uidToBrick = new Map();
     // brickToUid = new WeakMap();
     return {
       main: getBricksByMountPoint("#main-mount-point"),
+      portal: getBricksByMountPoint("#portal-mount-point"),
       bg: getBricksByMountPoint("#bg-mount-point"),
     };
   }
@@ -205,7 +197,6 @@ function injectHook(): void {
   const hook = {
     getBrickByUid,
     getBricks,
-    getMainBricks,
     getBrickInfo,
     showInspectBox,
     hideInspectBox,

@@ -9,6 +9,7 @@ export interface RichBrickData extends BrickData {
 
 export interface BricksByMountPoint {
   main?: RichBrickData[];
+  portal?: RichBrickData[];
   bg?: RichBrickData[];
 }
 
