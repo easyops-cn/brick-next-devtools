@@ -1,0 +1,38 @@
+import React from "react";
+import { shallow } from "enzyme";
+import { Button } from "@blueprintjs/core";
+import { TransformationsPanel } from "./TransformationsPanel";
+import { useTransformationsContext } from "../libs/TransformationsContext";
+
+jest.mock("../libs/TransformationsContext");
+const setTransformations = jest.fn();
+(useTransformationsContext as jest.Mock).mockReturnValue({
+  transformations: [
+    {
+      transform: "quality",
+      result: {
+        quality: "good",
+      },
+      data: "good",
+      options: {},
+    },
+  ],
+  setTransformations,
+});
+
+describe("TransformationsPanel", () => {
+  afterEach(() => {
+    setTransformations.mockClear();
+  });
+
+  it("should work", () => {
+    const wrapper = shallow(<TransformationsPanel />);
+    expect(wrapper.find("tbody").find("tr").length).toBe(1);
+  });
+
+  it("should handle clear", () => {
+    const wrapper = shallow(<TransformationsPanel />);
+    wrapper.find(Button).invoke("onClick")(null);
+    expect(setTransformations).toBeCalled();
+  });
+});

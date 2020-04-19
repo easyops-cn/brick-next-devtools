@@ -1,4 +1,4 @@
-import { MESSAGE_SOURCE_HOOK } from "./shared";
+import { MESSAGE_SOURCE_HOOK } from "./shared/constants";
 
 function injectScript(file: string): void {
   const script = document.createElement("script");

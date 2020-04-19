@@ -9,7 +9,7 @@ npm install
 npm start
 ```
 
-Follow [Official Tutorial](https://developer.chrome.com/extensions/getstarted), when loading unpacked extension, choose the `brick-next-devtools/extension` directory.
+Follow [official tutorial](https://developer.chrome.com/extensions/getstarted), when loading unpacked extension, choose the `brick-next-devtools/extension` directory.
 
 ## Testing
 
@@ -32,7 +32,7 @@ npm test src/some-file.spec.ts -- --watch
 To test a specified file and collect coverage from related files only:
 
 ```
-npm test src/some-file.spec.ts -- no-collect-coverage-from
+npm test src/some-file.spec.ts -- --no-collect-coverage-from
 ```
 
 ## Publish

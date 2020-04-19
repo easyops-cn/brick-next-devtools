@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 module.exports = {
@@ -37,7 +38,7 @@ module.exports = {
         test: /\.css$/,
         // Ref https://github.com/webpack-contrib/mini-css-extract-plugin/issues/118
         sideEffects: true,
-        use: ["style-loader", "css-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
         test: /\.(woff(2)?|ttf|eot)$/,
@@ -67,5 +68,6 @@ module.exports = {
       chunks: ["devtools"],
       filename: "devtools.html",
     }),
+    new MiniCssExtractPlugin(),
   ],
 };
