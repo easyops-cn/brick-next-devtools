@@ -7,7 +7,7 @@ import { PROP_DEHYDRATED } from "../shared/constants";
  *
  * @param value data to transfer.
  * @param repo  repository to collect circular references.
- * @returns original value if it's serializable, and a dehydrated wrapper if not.
+ * @returns original value if it's serializable, or a dehydrated wrapper if not.
  */
 export function dehydrate(value: any, repo: any[], memo = new WeakMap()): any {
   if (memo.has(value)) {

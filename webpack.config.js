@@ -6,6 +6,8 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 module.exports = {
   mode: process.env.NODE_ENV === "development" ? "development" : "production",
   devtool:
+    // DevTools page doesn't support separated source-map yet.
+    // Use inline-source-map in development only.
     process.env.NODE_ENV === "development" ? "inline-source-map" : undefined,
   context: __dirname,
   entry: {
