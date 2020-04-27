@@ -45,7 +45,14 @@ export function TransformationsPanel(): React.ReactElement {
                     <PropItem propValue={item.data} standalone />
                   </td>
                   <td>
-                    <PropItem propValue={item.options} standalone />
+                    <PropItem
+                      propValue={Object.fromEntries(
+                        Object.entries(item.options).filter(
+                          (entry) => entry[1] !== undefined
+                        )
+                      )}
+                      standalone
+                    />
                   </td>
                 </tr>
               ))}

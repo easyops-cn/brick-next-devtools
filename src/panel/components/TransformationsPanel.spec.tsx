@@ -14,7 +14,10 @@ const setTransformations = jest.fn();
         quality: "good",
       },
       data: "good",
-      options: {},
+      options: {
+        from: "list",
+        mapArray: undefined,
+      },
     },
   ],
   setTransformations,
