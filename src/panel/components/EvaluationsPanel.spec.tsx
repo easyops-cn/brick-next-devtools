@@ -1,6 +1,6 @@
 import React from "react";
 import { shallow } from "enzyme";
-import { Button, InputGroup } from "@blueprintjs/core";
+import { Button, InputGroup, Switch } from "@blueprintjs/core";
 import { EvaluationsPanel } from "./EvaluationsPanel";
 import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { PropItem } from "./PropList";
@@ -39,6 +39,17 @@ describe("EvaluationsPanel", () => {
   it("should work", () => {
     const wrapper = shallow(<EvaluationsPanel />);
     expect(wrapper.find("tbody").find("tr").length).toBe(2);
+  });
+
+  it("should toggle string-wrap", () => {
+    const wrapper = shallow(<EvaluationsPanel />);
+    expect(wrapper.hasClass("string-wrap")).toBe(false);
+    wrapper.find(Switch).invoke("onChange")({
+      target: {
+        checked: true,
+      },
+    } as any);
+    expect(wrapper.hasClass("string-wrap")).toBe(true);
   });
 
   it("should handle clear", () => {

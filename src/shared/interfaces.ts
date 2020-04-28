@@ -1,6 +1,8 @@
 export interface BrickData {
   uid: number;
-  tagName: string;
+  tagName?: string;
+  includesInternalBricks?: boolean;
+  invalid?: boolean;
 }
 
 export interface RichBrickData extends BrickData {
@@ -23,8 +25,8 @@ export interface RuntimeBrick {
 }
 
 export interface BrickElement extends HTMLElement {
-  $$typeof?: "brick" | "provider" | "custom-template";
-  $$eventListeners: [string, Function, any?][];
+  $$typeof?: "brick" | "provider" | "custom-template" | "native" | "invalid";
+  $$eventListeners?: [string, Function, any?][];
 }
 
 export interface BrickElementConstructor extends Function {
@@ -41,6 +43,7 @@ export interface DehydratedBrickInfo {
 }
 
 export interface BrickInfo {
+  nativeProperties?: Record<string, any>;
   properties?: Record<string, any>;
   events?: [string, any][];
 }

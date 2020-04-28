@@ -1,4 +1,5 @@
 :root {
+  --text-color: #182026;
   --pane-border-color: rgba(16, 22, 26, 0.15);
   --brick-label-color: rgb(136, 18, 128);
   --caret-color: #999;
@@ -12,6 +13,7 @@
 }
 
 .bp3-dark {
+  --text-color: #f5f8fa;
   --pane-border-color: rgba(255, 255, 255, 0.15);
   --brick-label-color: rgb(93, 176, 215);
   --caret-color: #727272;
@@ -82,7 +84,18 @@ body {
   align-items: center;
 }
 
-.tree-toolbar .bp3-control {
+.toolbar-group {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-group > *:not(:last-child) {
+  margin-right: 10px;
+}
+
+.tree-toolbar .bp3-control,
+.evaluations-toolbar .bp3-control,
+.transformations-toolbar .bp3-control {
   margin-bottom: 0;
   font-size: 12px;
 }
@@ -109,6 +122,14 @@ body {
   color: var(--brick-label-color);
   font-size: 12px;
   font-family: Menlo, monospace;
+}
+
+.brick-title.includes-internal-bricks {
+  color: var(--source-code-gray);
+}
+
+.brick-title.native {
+  color: var(--text-color);
 }
 
 .brick-label .bp3-popover-wrapper {
@@ -147,6 +168,11 @@ body {
 
 .variable-string {
   color: var(--source-code-string);
+}
+
+.string-wrap .variable-string-full {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .variable-function {

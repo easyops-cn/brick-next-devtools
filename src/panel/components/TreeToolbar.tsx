@@ -11,7 +11,10 @@ import { PanelSelector } from "./PanelSelector";
 export function TreeToolbar(): React.ReactElement {
   const { setTree } = useBrickTreeContext();
   const { showFullName, setShowFullName } = useShowFullNameContext();
-  const { setCollapsedBrickIds } = useCollapsedBrickIdsContext();
+  const {
+    setCollapsedBrickIds,
+    setExpandedInternalIds,
+  } = useCollapsedBrickIdsContext();
   const { setSelectedBrick } = useSelectedBrickContext();
 
   const handleRefresh = React.useCallback((): void => {
@@ -25,10 +28,11 @@ export function TreeToolbar(): React.ReactElement {
 
         setTree(result);
         setCollapsedBrickIds([]);
+        setExpandedInternalIds([]);
         setSelectedBrick(null);
       }
     );
-  }, [setTree, setCollapsedBrickIds, setSelectedBrick]);
+  }, [setTree, setCollapsedBrickIds, setExpandedInternalIds, setSelectedBrick]);
 
   React.useEffect(() => {
     handleRefresh();

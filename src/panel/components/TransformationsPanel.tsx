@@ -1,25 +1,47 @@
 import React from "react";
-import { Button, Tooltip, ButtonGroup } from "@blueprintjs/core";
+import { Button, Tooltip, ButtonGroup, Switch } from "@blueprintjs/core";
+import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useTransformationsContext } from "../libs/TransformationsContext";
 import { PropItem } from "./PropList";
 
 export function TransformationsPanel(): React.ReactElement {
   const { transformations, setTransformations } = useTransformationsContext();
+  const [stringWrap, setStringWrap] = React.useState(false);
 
   const handleClear = React.useCallback(() => {
     setTransformations([]);
   }, [setTransformations]);
 
+  const handleToggleStringWrap = React.useCallback(
+    (event: React.FormEvent<HTMLInputElement>) => {
+      setStringWrap((event.target as HTMLInputElement).checked);
+    },
+    []
+  );
+
   return (
-    <div className="panel transformations-panel">
+    <div
+      className={classNames("panel transformations-panel", {
+        "string-wrap": stringWrap,
+      })}
+    >
       <div className="transformations-toolbar">
-        <PanelSelector />
-        <ButtonGroup>
-          <Tooltip content="Clear" hoverOpenDelay={300}>
-            <Button icon="disable" minimal onClick={handleClear} />
-          </Tooltip>
-        </ButtonGroup>
+        <div className="toolbar-group">
+          <PanelSelector />
+          <ButtonGroup>
+            <Tooltip content="Clear" hoverOpenDelay={300}>
+              <Button icon="disable" minimal onClick={handleClear} />
+            </Tooltip>
+          </ButtonGroup>
+        </div>
+        <div className="toolbar-group">
+          <Switch
+            checked={stringWrap}
+            label="String Wrap"
+            onChange={handleToggleStringWrap}
+          />
+        </div>
       </div>
       <div className="table-view">
         <div className="scroll-container">

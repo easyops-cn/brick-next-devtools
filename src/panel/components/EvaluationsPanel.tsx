@@ -1,11 +1,19 @@
 import React from "react";
-import { Button, Tooltip, ButtonGroup, InputGroup } from "@blueprintjs/core";
+import {
+  Button,
+  Tooltip,
+  ButtonGroup,
+  InputGroup,
+  Switch,
+} from "@blueprintjs/core";
+import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { PropList, PropItem } from "./PropList";
 
 export function EvaluationsPanel(): React.ReactElement {
   const { evaluations, setEvaluations } = useEvaluationsContext();
+  const [stringWrap, setStringWrap] = React.useState(false);
   const [q, setQ] = React.useState<string>();
 
   const handleClear = React.useCallback(() => {
@@ -28,11 +36,27 @@ export function EvaluationsPanel(): React.ReactElement {
     );
   }, [evaluations, q]);
 
+  const handleToggleStringWrap = React.useCallback(
+    (event: React.FormEvent<HTMLInputElement>) => {
+      setStringWrap((event.target as HTMLInputElement).checked);
+    },
+    []
+  );
+
   return (
-    <div className="panel evaluations-panel">
+    <div
+      className={classNames("panel evaluations-panel", {
+        "string-wrap": stringWrap,
+      })}
+    >
       <div className="evaluations-toolbar">
-        <div style={{ display: "flex", alignItems: "center" }}>
+        <div className="toolbar-group">
           <PanelSelector />
+          <ButtonGroup>
+            <Tooltip content="Clear" hoverOpenDelay={300}>
+              <Button icon="disable" minimal onClick={handleClear} />
+            </Tooltip>
+          </ButtonGroup>
           <InputGroup
             leftIcon="filter"
             onChange={handleFilterChange}
@@ -40,11 +64,13 @@ export function EvaluationsPanel(): React.ReactElement {
             value={q}
           />
         </div>
-        <ButtonGroup>
-          <Tooltip content="Clear" hoverOpenDelay={300}>
-            <Button icon="disable" minimal onClick={handleClear} />
-          </Tooltip>
-        </ButtonGroup>
+        <div className="toolbar-group">
+          <Switch
+            checked={stringWrap}
+            label="String Wrap"
+            onChange={handleToggleStringWrap}
+          />
+        </div>
       </div>
       <div className="table-view">
         <div className="scroll-container">

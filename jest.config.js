@@ -10,4 +10,5 @@ module.exports = {
   coverageReporters: ["lcov", "text-summary"],
   coveragePathIgnorePatterns: ["/node_modules/", "/extension/"],
   testPathIgnorePatterns: ["/node_modules/", "/extension/"],
+  testEnvironment: "jest-environment-jsdom-sixteen",
 };

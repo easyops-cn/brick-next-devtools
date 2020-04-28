@@ -126,13 +126,13 @@ export function StringDisplay({
     return <span className="variable-string">{`"${value}"`}</span>;
   }
   return (
-    <>
+    <span className="variable-string-full">
       <span className="variable-punctuation">{'"'}</span>
       <span className="variable-string" title={value}>
         {value}
       </span>
       <span className="variable-punctuation">{'"'}</span>
-    </>
+    </span>
   );
 }
 

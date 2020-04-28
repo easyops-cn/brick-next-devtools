@@ -22,6 +22,12 @@ const collapsedBrickIdsContext: ContextOfCollapsedBrickIds = {
       setter([100]);
     }
   }),
+  expandedInternalIds: [200],
+  setExpandedInternalIds: jest.fn((setter) => {
+    if (typeof setter === "function") {
+      setter([200]);
+    }
+  }),
 };
 
 (useBrickTreeContext as jest.Mock).mockReturnValue({});
@@ -49,6 +55,7 @@ describe("BrickTree", () => {
     setSelectedBrick.mockClear();
     // collapsedBrickIdsContext.collapsedBrickIds = [];
     (collapsedBrickIdsContext.setCollapsedBrickIds as jest.Mock).mockClear();
+    (collapsedBrickIdsContext.setExpandedInternalIds as jest.Mock).mockClear();
   });
 
   it("should work when no tree", () => {
@@ -111,14 +118,35 @@ describe("BrickTree", () => {
         },
       ],
     };
+    const brickX: RichBrickData = {
+      uid: 3,
+      tagName: "x",
+      children: [
+        {
+          uid: 4,
+          includesInternalBricks: true,
+          children: [
+            {
+              uid: 5,
+              tagName: "y",
+              children: [],
+            },
+          ],
+        },
+      ],
+    };
     const tree: BricksByMountPoint = {
-      main: [brickA],
+      main: [brickA, brickX],
     };
     (useBrickTreeContext as jest.Mock).mockReturnValue({ tree });
 
     const wrapper = shallow(<BrickTree />);
 
     expect(wrapper.find(Tree).prop("contents")[0].isExpanded).toBe(true);
+    expect(wrapper.find(Tree).prop("contents")[1].isExpanded).toBe(true);
+    expect(
+      wrapper.find(Tree).prop("contents")[1].childNodes[0].isExpanded
+    ).toBe(false);
 
     (wrapper.find(Tree).invoke("onNodeClick") as any)({
       nodeData: brickA,
@@ -128,9 +156,10 @@ describe("BrickTree", () => {
 
     (wrapper.find(Tree).invoke("onNodeCollapse") as any)({
       id: 1,
+      nodeData: {},
     });
     // Todo(steve): context not updated
-    expect(collapsedBrickIdsContext.setCollapsedBrickIds).toBeCalled();
+    expect(collapsedBrickIdsContext.setCollapsedBrickIds).toBeCalledTimes(1);
     // expect(
     //   collapsedBrickIdsContext.setCollapsedBrickIds
     // ).toHaveBeenNthCalledWith(1, [100, 1]);
@@ -138,16 +167,54 @@ describe("BrickTree", () => {
 
     (wrapper.find(Tree).invoke("onNodeExpand") as any)({
       id: 1,
+      nodeData: {},
     });
     // Todo(steve): context not updated
-    expect(collapsedBrickIdsContext.setCollapsedBrickIds).toBeCalled();
+    expect(collapsedBrickIdsContext.setCollapsedBrickIds).toBeCalledTimes(2);
     // expect(
     //   collapsedBrickIdsContext.setCollapsedBrickIds
     // ).toHaveBeenNthCalledWith(2, [100]);
     // expect(wrapper.find(Tree).prop("contents")[0].isExpanded).toBe(true);
 
+    // Internal expand.
+    (wrapper.find(Tree).invoke("onNodeExpand") as any)({
+      id: 4,
+      nodeData: {
+        includesInternalBricks: true,
+      },
+    });
+    expect(collapsedBrickIdsContext.setExpandedInternalIds).toBeCalledTimes(1);
+
+    // Internal collapse.
+    (wrapper.find(Tree).invoke("onNodeCollapse") as any)({
+      id: 4,
+      nodeData: {
+        includesInternalBricks: true,
+      },
+    });
+    expect(collapsedBrickIdsContext.setExpandedInternalIds).toBeCalledTimes(2);
+
+    // Ignore internal.
+    (wrapper.find(Tree).invoke("onNodeMouseEnter") as any)({
+      id: 4,
+      nodeData: {
+        includesInternalBricks: true,
+      },
+    });
+    expect(mockEval).not.toBeCalled();
+
+    // Ignore internal.
+    (wrapper.find(Tree).invoke("onNodeMouseLeave") as any)({
+      id: 4,
+      nodeData: {
+        includesInternalBricks: true,
+      },
+    });
+    expect(mockEval).not.toBeCalled();
+
     (wrapper.find(Tree).invoke("onNodeMouseEnter") as any)({
       id: 1,
+      nodeData: {},
     });
     expect(mockEval).toHaveBeenNthCalledWith(
       1,
@@ -156,6 +223,7 @@ describe("BrickTree", () => {
 
     (wrapper.find(Tree).invoke("onNodeMouseLeave") as any)({
       id: 1,
+      nodeData: {},
     });
     expect(mockEval).toHaveBeenNthCalledWith(
       2,
