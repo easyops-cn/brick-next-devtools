@@ -18,11 +18,13 @@ const setTree = jest.fn();
 const setSelectedBrick = jest.fn();
 const setShowFullName = jest.fn();
 const setCollapsedBrickIds = jest.fn();
+const setExpandedInternalIds = jest.fn();
 
 (useBrickTreeContext as jest.Mock).mockReturnValue({ setTree });
 (useSelectedBrickContext as jest.Mock).mockReturnValue({ setSelectedBrick });
 (useCollapsedBrickIdsContext as jest.Mock).mockReturnValue({
   setCollapsedBrickIds,
+  setExpandedInternalIds,
 });
 (useShowFullNameContext as jest.Mock).mockReturnValue({
   showFullName: false,
@@ -59,6 +61,7 @@ describe("TreeToolbar", () => {
     expect(mockEval).toBeCalledTimes(1);
     expect(setTree).toBeCalledWith({ main: [], bg: [] });
     expect(setCollapsedBrickIds).toBeCalledWith([]);
+    expect(setExpandedInternalIds).toBeCalledWith([]);
     expect(setSelectedBrick).toBeCalledWith(null);
 
     wrapper.find(Button).invoke("onClick")(null);

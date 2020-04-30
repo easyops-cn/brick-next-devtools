@@ -12,6 +12,9 @@ export function BricksPanel(): React.ReactElement {
   const [collapsedBrickIds, setCollapsedBrickIds] = React.useState<number[]>(
     []
   );
+  const [expandedInternalIds, setExpandedInternalIds] = React.useState<
+    number[]
+  >([]);
   const [showFullName, setShowFullName] = React.useState<boolean>(false);
   const [selectedBrick, setSelectedBrick] = React.useState<BrickData>();
 
@@ -33,6 +36,8 @@ export function BricksPanel(): React.ReactElement {
             value={{
               collapsedBrickIds,
               setCollapsedBrickIds,
+              expandedInternalIds,
+              setExpandedInternalIds,
             }}
           >
             <ShowFullNameContext.Provider

@@ -12,12 +12,16 @@ export function BrickTree(): React.ReactElement {
   const {
     collapsedBrickIds,
     setCollapsedBrickIds,
+    expandedInternalIds,
+    setExpandedInternalIds,
   } = useCollapsedBrickIdsContext();
   const { selectedBrick, setSelectedBrick } = useSelectedBrickContext();
 
   const handleNodeClick = React.useCallback(
     (node: ITreeNode<BrickData>) => {
-      setSelectedBrick(node.nodeData);
+      if (!node.nodeData.includesInternalBricks) {
+        setSelectedBrick(node.nodeData);
+      }
     },
     [setSelectedBrick]
   );
@@ -30,32 +34,42 @@ export function BrickTree(): React.ReactElement {
 
   const handleNodeCollapse = React.useCallback(
     (node: ITreeNode<BrickData>) => {
-      setCollapsedBrickIds((prev) => prev.concat(node.id as number));
+      if (node.nodeData.includesInternalBricks) {
+        setExpandedInternalIds((prev) => prev.filter((id) => id !== node.id));
+      } else {
+        setCollapsedBrickIds((prev) => prev.concat(node.id as number));
+      }
     },
-    [setCollapsedBrickIds]
+    [setExpandedInternalIds, setCollapsedBrickIds]
   );
 
   const handleNodeExpand = React.useCallback(
     (node: ITreeNode<BrickData>) => {
-      setCollapsedBrickIds((prev) => prev.filter((id) => id !== node.id));
+      if (node.nodeData.includesInternalBricks) {
+        setExpandedInternalIds((prev) => prev.concat(node.id as number));
+      } else {
+        setCollapsedBrickIds((prev) => prev.filter((id) => id !== node.id));
+      }
     },
-    [setCollapsedBrickIds]
+    [setExpandedInternalIds, setCollapsedBrickIds]
   );
 
   const handleNodeMouseEnter = React.useCallback(
     (node: ITreeNode<BrickData>) => {
-      chrome.devtools.inspectedWindow.eval(
-        `inspect(window.${HOOK_NAME}.inspectBrick(${node.id}));`
-      );
+      node.nodeData.includesInternalBricks ||
+        chrome.devtools.inspectedWindow.eval(
+          `inspect(window.${HOOK_NAME}.inspectBrick(${node.id}));`
+        );
     },
     []
   );
 
   const handleNodeMouseLeave = React.useCallback(
     (node: ITreeNode<BrickData>) => {
-      chrome.devtools.inspectedWindow.eval(
-        `inspect(window.${HOOK_NAME}.dismissInspections(${node.id}));`
-      );
+      node.nodeData.includesInternalBricks ||
+        chrome.devtools.inspectedWindow.eval(
+          `inspect(window.${HOOK_NAME}.dismissInspections(${node.id}));`
+        );
     },
     []
   );
@@ -67,12 +81,22 @@ export function BrickTree(): React.ReactElement {
       return {
         id: node.uid,
         hasCaret: node.children.length > 0,
-        isExpanded: !collapsedBrickIds.includes(node.uid),
+        isExpanded: node.includesInternalBricks
+          ? expandedInternalIds.includes(node.uid)
+          : !collapsedBrickIds.includes(node.uid),
         isSelected: node.uid === selectedBrick?.uid,
-        label: <BrickLabel tagName={node.tagName} />,
+        label: (
+          <BrickLabel
+            tagName={node.tagName}
+            includesInternalBricks={node.includesInternalBricks}
+            invalid={node.invalid}
+          />
+        ),
         nodeData: {
           uid: node.uid,
           tagName: node.tagName,
+          includesInternalBricks: node.includesInternalBricks,
+          invalid: node.invalid,
         },
         childNodes: node.children.map(walk),
       };
@@ -82,7 +106,7 @@ export function BrickTree(): React.ReactElement {
         .filter((entry) => entry[1].length > 0)
         .map((entry) => [entry[0], entry[1].map(walk)])
     );
-  }, [tree, collapsedBrickIds, selectedBrick]);
+  }, [tree, collapsedBrickIds, expandedInternalIds, selectedBrick]);
 
   return (
     <div className="brick-tree source-code">
