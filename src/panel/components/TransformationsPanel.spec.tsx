@@ -6,6 +6,7 @@ import { useTransformationsContext } from "../libs/TransformationsContext";
 
 jest.mock("../libs/TransformationsContext");
 const setTransformations = jest.fn();
+const savePreserveLogs = jest.fn();
 (useTransformationsContext as jest.Mock).mockReturnValue({
   transformations: [
     {
@@ -21,6 +22,7 @@ const setTransformations = jest.fn();
     },
   ],
   setTransformations,
+  savePreserveLogs,
 });
 
 describe("TransformationsPanel", () => {
@@ -36,12 +38,22 @@ describe("TransformationsPanel", () => {
   it("should toggle string-wrap", () => {
     const wrapper = shallow(<TransformationsPanel />);
     expect(wrapper.hasClass("string-wrap")).toBe(false);
-    wrapper.find(Switch).invoke("onChange")({
+    wrapper.find("[label='String Wrap']").invoke("onChange")({
       target: {
         checked: true,
       },
     } as any);
     expect(wrapper.hasClass("string-wrap")).toBe(true);
+  });
+
+  it("should toggle preserveLogs", () => {
+    const wrapper = shallow(<TransformationsPanel />);
+    wrapper.find("[label='Preserve logs']").invoke("onChange")({
+      target: {
+        checked: true,
+      },
+    } as any);
+    expect(savePreserveLogs).toBeCalledWith(true);
   });
 
   it("should handle clear", () => {

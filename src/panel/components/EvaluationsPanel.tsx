@@ -10,9 +10,15 @@ import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { PropList, PropItem } from "./PropList";
+import { Storage } from "../libs/Storage";
 
 export function EvaluationsPanel(): React.ReactElement {
-  const { evaluations, setEvaluations } = useEvaluationsContext();
+  const {
+    evaluations,
+    setEvaluations,
+    preserveLogs,
+    savePreserveLogs,
+  } = useEvaluationsContext();
   const [stringWrap, setStringWrap] = React.useState(false);
   const [q, setQ] = React.useState<string>();
 
@@ -43,6 +49,17 @@ export function EvaluationsPanel(): React.ReactElement {
     []
   );
 
+  const handleToggleLogs = React.useCallback(
+    (event: React.FormEvent<HTMLInputElement>) => {
+      savePreserveLogs((event.target as HTMLInputElement).checked);
+      // Storage.setItem(
+      //   "preserveLogs",
+      //   (event.target as HTMLInputElement).checked
+      // );
+    },
+    []
+  );
+
   return (
     <div
       className={classNames("panel evaluations-panel", {
@@ -65,6 +82,11 @@ export function EvaluationsPanel(): React.ReactElement {
           />
         </div>
         <div className="toolbar-group">
+          <Switch
+            checked={preserveLogs}
+            label="Preserve logs"
+            onChange={handleToggleLogs}
+          />
           <Switch
             checked={stringWrap}
             label="String Wrap"

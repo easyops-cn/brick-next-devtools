@@ -7,6 +7,7 @@ import { PropItem } from "./PropList";
 
 jest.mock("../libs/EvaluationsContext");
 const setEvaluations = jest.fn();
+const savePreserveLogs = jest.fn();
 (useEvaluationsContext as jest.Mock).mockReturnValue({
   evaluations: [
     {
@@ -29,6 +30,7 @@ const setEvaluations = jest.fn();
     },
   ],
   setEvaluations,
+  savePreserveLogs,
 });
 
 describe("EvaluationsPanel", () => {
@@ -44,7 +46,7 @@ describe("EvaluationsPanel", () => {
   it("should toggle string-wrap", () => {
     const wrapper = shallow(<EvaluationsPanel />);
     expect(wrapper.hasClass("string-wrap")).toBe(false);
-    wrapper.find(Switch).invoke("onChange")({
+    wrapper.find("[label='String Wrap']").invoke("onChange")({
       target: {
         checked: true,
       },
@@ -56,6 +58,16 @@ describe("EvaluationsPanel", () => {
     const wrapper = shallow(<EvaluationsPanel />);
     wrapper.find(Button).invoke("onClick")(null);
     expect(setEvaluations).toBeCalledWith([]);
+  });
+
+  it("should toggle preserveLogs", () => {
+    const wrapper = shallow(<EvaluationsPanel />);
+    wrapper.find("[label='Preserve logs']").invoke("onChange")({
+      target: {
+        checked: true,
+      },
+    } as any);
+    expect(savePreserveLogs).toBeCalledWith(true);
   });
 
   it("should handle filter", () => {
