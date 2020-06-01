@@ -4,9 +4,15 @@ import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useTransformationsContext } from "../libs/TransformationsContext";
 import { PropItem } from "./PropList";
+import { Storage } from "../libs/Storage";
 
 export function TransformationsPanel(): React.ReactElement {
-  const { transformations, setTransformations } = useTransformationsContext();
+  const {
+    transformations,
+    setTransformations,
+    preserveLogs,
+    savePreserveLogs,
+  } = useTransformationsContext();
   const [stringWrap, setStringWrap] = React.useState(false);
 
   const handleClear = React.useCallback(() => {
@@ -16,6 +22,17 @@ export function TransformationsPanel(): React.ReactElement {
   const handleToggleStringWrap = React.useCallback(
     (event: React.FormEvent<HTMLInputElement>) => {
       setStringWrap((event.target as HTMLInputElement).checked);
+    },
+    []
+  );
+
+  const handleToggleLogs = React.useCallback(
+    (event: React.FormEvent<HTMLInputElement>) => {
+      savePreserveLogs((event.target as HTMLInputElement).checked);
+      // Storage.setItem(
+      //   "preserveLogs",
+      //   (event.target as HTMLInputElement).checked
+      // );
     },
     []
   );
@@ -36,6 +53,11 @@ export function TransformationsPanel(): React.ReactElement {
           </ButtonGroup>
         </div>
         <div className="toolbar-group">
+          <Switch
+            checked={preserveLogs}
+            label="Preserve logs"
+            onChange={handleToggleLogs}
+          />
           <Switch
             checked={stringWrap}
             label="String Wrap"

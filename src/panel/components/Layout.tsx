@@ -21,6 +21,7 @@ export function Layout(): React.ReactElement {
     Storage.getItem("selectedPanel") ?? "Bricks"
   );
   const [evaluations, setEvaluations] = React.useState<Evaluation[]>([]);
+  const [preserveLogs, savePreserveLogs] = React.useState<boolean>(true);
   const [transformations, setTransformations] = React.useState<
     Transformation[]
   >([]);
@@ -33,11 +34,17 @@ export function Layout(): React.ReactElement {
         ((data = event.data.payload), data?.type === "evaluation")
       ) {
         setEvaluations((prev) => prev.concat(hydrate(data.payload, data.repo)));
+      } else if (
+        event.data?.source === MESSAGE_SOURCE_HOOK &&
+        ((data = event.data.payload), data?.type === "locationChange") &&
+        !(preserveLogs ?? true)
+      ) {
+        setEvaluations([]);
       }
     }
     window.addEventListener("message", onMessage);
     return (): void => window.removeEventListener("message", onMessage);
-  }, []);
+  }, [preserveLogs]);
 
   React.useEffect(() => {
     function onMessage(event: MessageEvent): void {
@@ -49,11 +56,17 @@ export function Layout(): React.ReactElement {
         setTransformations((prev) =>
           prev.concat(hydrate(data.payload, data.repo))
         );
+      } else if (
+        event.data?.source === MESSAGE_SOURCE_HOOK &&
+        ((data = event.data.payload), data?.type === "locationChange") &&
+        !(preserveLogs ?? true)
+      ) {
+        setTransformations([]);
       }
     }
     window.addEventListener("message", onMessage);
     return (): void => window.removeEventListener("message", onMessage);
-  }, []);
+  }, [preserveLogs]);
 
   React.useEffect(() => {
     Storage.setItem("selectedPanel", selectedPanel);
@@ -73,13 +86,23 @@ export function Layout(): React.ReactElement {
         >
           {selectedPanel === "Evaluations" ? (
             <EvaluationsContext.Provider
-              value={{ evaluations, setEvaluations }}
+              value={{
+                evaluations,
+                setEvaluations,
+                preserveLogs,
+                savePreserveLogs,
+              }}
             >
               <EvaluationsPanel />
             </EvaluationsContext.Provider>
           ) : selectedPanel === "Transformations" ? (
             <TransformationsContext.Provider
-              value={{ transformations, setTransformations }}
+              value={{
+                transformations,
+                setTransformations,
+                preserveLogs,
+                savePreserveLogs,
+              }}
             >
               <TransformationsPanel />
             </TransformationsContext.Provider>

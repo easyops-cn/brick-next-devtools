@@ -11,8 +11,17 @@ import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { useTransformationsContext } from "../libs/TransformationsContext";
 
 function MockEvaluationsPanel(): React.ReactElement {
-  const { evaluations } = useEvaluationsContext();
-  return <div>EvaluationsPanel ({evaluations.length})</div>;
+  const { evaluations, savePreserveLogs } = useEvaluationsContext();
+  return (
+    <div
+      onChange={(e) => {
+        savePreserveLogs(e.target.value);
+      }}
+      id="EvaluationsPanel"
+    >
+      EvaluationsPanel ({evaluations.length})
+    </div>
+  );
 }
 
 function MockTransformationsPanel(): React.ReactElement {
@@ -124,6 +133,44 @@ describe("Layout", () => {
       await new Promise((resolve) => setTimeout(resolve));
     });
     expect(wrapper.text()).toBe("TransformationsPanel (1)");
+    wrapper.unmount();
+  });
+
+  it.each([
+    [undefined, 1],
+    [false, 0],
+  ])("locationChange should work", async (value, length) => {
+    storageGetItem.mockReturnValue("Evaluations");
+    const wrapper = mount(<Layout />);
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "evaluation",
+            payload: "good",
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    wrapper.find("#EvaluationsPanel").first().invoke("onChange")({
+      target: { value },
+    });
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "locationChange",
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(wrapper.text()).toBe(`EvaluationsPanel (${length})`);
     wrapper.unmount();
   });
 });
