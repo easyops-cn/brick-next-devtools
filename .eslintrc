@@ -6,15 +6,18 @@
   ],
   "extends": [
     "eslint:recommended",
-    "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "prettier",
     "prettier/@typescript-eslint"
   ],
   "env": {
+    "browser": true,
     "es6": true,
     "jest": true
+  },
+  "globals": {
+    "chrome": true
   },
   "parserOptions": {
     "ecmaVersion": 9,

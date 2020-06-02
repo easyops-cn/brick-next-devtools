@@ -10,7 +10,6 @@ import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { PropList, PropItem } from "./PropList";
-import { Storage } from "../libs/Storage";
 
 export function EvaluationsPanel(): React.ReactElement {
   const {
@@ -52,12 +51,8 @@ export function EvaluationsPanel(): React.ReactElement {
   const handleToggleLogs = React.useCallback(
     (event: React.FormEvent<HTMLInputElement>) => {
       savePreserveLogs((event.target as HTMLInputElement).checked);
-      // Storage.setItem(
-      //   "preserveLogs",
-      //   (event.target as HTMLInputElement).checked
-      // );
     },
-    []
+    [savePreserveLogs]
   );
 
   return (
@@ -89,7 +84,7 @@ export function EvaluationsPanel(): React.ReactElement {
           />
           <Switch
             checked={stringWrap}
-            label="String Wrap"
+            label="String wrap"
             onChange={handleToggleStringWrap}
           />
         </div>
