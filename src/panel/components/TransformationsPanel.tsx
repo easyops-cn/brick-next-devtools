@@ -4,7 +4,6 @@ import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useTransformationsContext } from "../libs/TransformationsContext";
 import { PropItem } from "./PropList";
-import { Storage } from "../libs/Storage";
 
 export function TransformationsPanel(): React.ReactElement {
   const {
@@ -29,12 +28,8 @@ export function TransformationsPanel(): React.ReactElement {
   const handleToggleLogs = React.useCallback(
     (event: React.FormEvent<HTMLInputElement>) => {
       savePreserveLogs((event.target as HTMLInputElement).checked);
-      // Storage.setItem(
-      //   "preserveLogs",
-      //   (event.target as HTMLInputElement).checked
-      // );
     },
-    []
+    [savePreserveLogs]
   );
 
   return (
