@@ -15,7 +15,7 @@ function MockEvaluationsPanel(): React.ReactElement {
   return (
     <div
       onChange={(e) => {
-        savePreserveLogs(e.target.value);
+        savePreserveLogs((e.target as any).value);
       }}
       id="EvaluationsPanel"
     >
@@ -137,7 +137,7 @@ describe("Layout", () => {
   });
 
   it.each([
-    [undefined, 1],
+    [true, 1],
     [false, 0],
   ])("locationChange should work", async (value, length) => {
     storageGetItem.mockReturnValue("Evaluations");
@@ -157,7 +157,7 @@ describe("Layout", () => {
     });
     wrapper.find("#EvaluationsPanel").first().invoke("onChange")({
       target: { value },
-    });
+    } as any);
     await act(async () => {
       window.postMessage(
         {

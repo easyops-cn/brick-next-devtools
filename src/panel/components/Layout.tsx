@@ -21,7 +21,7 @@ export function Layout(): React.ReactElement {
     Storage.getItem("selectedPanel") ?? "Bricks"
   );
   const [evaluations, setEvaluations] = React.useState<Evaluation[]>([]);
-  const [preserveLogs, savePreserveLogs] = React.useState<boolean>(true);
+  const [preserveLogs, savePreserveLogs] = React.useState(false);
   const [transformations, setTransformations] = React.useState<
     Transformation[]
   >([]);
@@ -34,17 +34,11 @@ export function Layout(): React.ReactElement {
         ((data = event.data.payload), data?.type === "evaluation")
       ) {
         setEvaluations((prev) => prev.concat(hydrate(data.payload, data.repo)));
-      } else if (
-        event.data?.source === MESSAGE_SOURCE_HOOK &&
-        ((data = event.data.payload), data?.type === "locationChange") &&
-        !(preserveLogs ?? true)
-      ) {
-        setEvaluations([]);
       }
     }
     window.addEventListener("message", onMessage);
     return (): void => window.removeEventListener("message", onMessage);
-  }, [preserveLogs]);
+  }, []);
 
   React.useEffect(() => {
     function onMessage(event: MessageEvent): void {
@@ -56,11 +50,20 @@ export function Layout(): React.ReactElement {
         setTransformations((prev) =>
           prev.concat(hydrate(data.payload, data.repo))
         );
-      } else if (
+      }
+    }
+    window.addEventListener("message", onMessage);
+    return (): void => window.removeEventListener("message", onMessage);
+  }, []);
+
+  React.useEffect(() => {
+    function onMessage(event: MessageEvent): void {
+      if (
+        !preserveLogs &&
         event.data?.source === MESSAGE_SOURCE_HOOK &&
-        ((data = event.data.payload), data?.type === "locationChange") &&
-        !(preserveLogs ?? true)
+        event.data.payload?.type === "locationChange"
       ) {
+        setEvaluations([]);
         setTransformations([]);
       }
     }
