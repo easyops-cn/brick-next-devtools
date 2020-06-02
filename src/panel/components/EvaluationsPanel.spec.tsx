@@ -46,7 +46,7 @@ describe("EvaluationsPanel", () => {
   it("should toggle string-wrap", () => {
     const wrapper = shallow(<EvaluationsPanel />);
     expect(wrapper.hasClass("string-wrap")).toBe(false);
-    wrapper.find("[label='String Wrap']").invoke("onChange")({
+    wrapper.find("[label='String wrap']").invoke("onChange")({
       target: {
         checked: true,
       },

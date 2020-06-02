@@ -60,7 +60,7 @@ export function TransformationsPanel(): React.ReactElement {
           />
           <Switch
             checked={stringWrap}
-            label="String Wrap"
+            label="String wrap"
             onChange={handleToggleStringWrap}
           />
         </div>

@@ -89,7 +89,7 @@ export function EvaluationsPanel(): React.ReactElement {
           />
           <Switch
             checked={stringWrap}
-            label="String Wrap"
+            label="String wrap"
             onChange={handleToggleStringWrap}
           />
         </div>
