@@ -39,7 +39,7 @@ npm test src/some-file.spec.ts -- --no-collect-coverage-from
 
 ```
 npm run build
-npm zip
+npm run zip
 ```
 
 Upload zip file through Chrome Web Store Developer Dashboard.
