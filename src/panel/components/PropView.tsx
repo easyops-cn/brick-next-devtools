@@ -1,10 +1,24 @@
 import React from "react";
-import { Tag } from "@blueprintjs/core";
+import { Tag, Button, Tooltip } from "@blueprintjs/core";
 import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
 import { HOOK_NAME } from "../../shared/constants";
 import { BrickInfo, DehydratedBrickInfo } from "../../shared/interfaces";
 import { hydrate } from "../libs/hydrate";
 import { PropList } from "./PropList";
+
+const copyToClipboard = (text: string): void => {
+  // istanbul ignore next
+  const listener = (e: ClipboardEvent) => {
+    e.stopPropagation();
+    const clipboard = e.clipboardData;
+    clipboard.clearData();
+    clipboard.setData("text", text);
+    e.preventDefault();
+  };
+  document.addEventListener("copy", listener);
+  document.execCommand("copy");
+  document.removeEventListener("copy", listener);
+};
 
 function isNotEmpty(object: any[] | Record<string, any>): boolean {
   return object
@@ -42,6 +56,15 @@ export function PropView(): React.ReactElement {
     return null;
   }
 
+  const handleCopyProps = () => {
+    try {
+      const propsText = JSON.stringify(brickInfo.properties, null, 2);
+      copyToClipboard(propsText);
+    } catch (error) {
+      // do nothing
+    }
+  };
+
   return (
     <div className="prop-view source-code">
       <div className="scroll-container">
@@ -51,6 +74,17 @@ export function PropView(): React.ReactElement {
             <React.Fragment key={tag}>
               <div style={{ padding: 5 }}>
                 <Tag minimal>{tag}</Tag>
+                {key === "properties" && (
+                  <Tooltip content="Copy to clipboard" hoverOpenDelay={300}>
+                    <Button
+                      icon="duplicate"
+                      minimal
+                      onClick={handleCopyProps}
+                      style={{ marginLeft: "10px" }}
+                      small
+                    />
+                  </Tooltip>
+                )}
               </div>
               <div className="expanded">
                 <PropList list={brickInfo[key]} />
