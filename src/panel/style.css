@@ -156,7 +156,7 @@ body {
   cursor: default;
 }
 
-.prop-item-label > .bp3-icon {
+.prop-item-label > span > .bp3-icon {
   /* margin-top: -1px; */
   vertical-align: middle;
   color: var(--caret-color);
@@ -164,6 +164,13 @@ body {
 
 .prop-name {
   color: var(--source-code-name);
+}
+
+.prop-editable {
+  font-size: 12px;
+  margin: 10px 0 10px 18px;
+  display: block;
+  width: 90%;
 }
 
 .variable-string {

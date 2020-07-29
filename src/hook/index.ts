@@ -2,6 +2,7 @@ import { HOOK_NAME } from "../shared/constants";
 import { getBricks, getBrickByUid, getBrickInfo } from "./traverse";
 import { inspectElement, dismissInspections } from "./inspector";
 import { emit } from "./emit";
+import { overrideProps } from "./overrideProps";
 
 function injectHook(): void {
   if (Object.prototype.hasOwnProperty.call(window, HOOK_NAME)) {
@@ -15,6 +16,8 @@ function injectHook(): void {
     inspectBrick: (uid: number) => inspectElement(getBrickByUid(uid)),
     dismissInspections,
     emit,
+    overrideProps: (uid: number, propertyName: string, value: any) =>
+      overrideProps(getBrickByUid(uid), propertyName, value),
   };
 
   Object.defineProperty(hook, "pageHasBricks", {
