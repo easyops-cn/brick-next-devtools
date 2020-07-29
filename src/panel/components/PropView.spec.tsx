@@ -3,22 +3,26 @@ import { mount } from "enzyme";
 import { PropView } from "./PropView";
 import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
 import { PropList } from "./PropList";
+import { Button } from "@blueprintjs/core";
+import { DehydratedBrickInfo } from "../../shared/interfaces";
 
 jest.mock("../libs/SelectedBrickContext");
 
 (useSelectedBrickContext as jest.Mock).mockReturnValue({ selectedBrick: null });
 
-const mockEval = jest.fn((string: string, fn: Function): void => {
-  fn({
-    info: {
-      properties: {
-        quality: "good",
+const mockEval = jest.fn(
+  (string: string, fn: (brickInfo: DehydratedBrickInfo) => void): void => {
+    fn({
+      info: {
+        properties: {
+          quality: "good",
+        },
+        events: [["click", { action: "console.log" }]],
       },
-      events: [["click", { action: "console.log" }]],
-    },
-    repo: [],
-  });
-});
+      repo: [],
+    });
+  }
+);
 
 (window as any).chrome = {
   devtools: {
@@ -57,5 +61,18 @@ describe("PropView", () => {
     ]);
 
     (useSelectedBrickContext as jest.Mock).mockReset();
+  });
+
+  it("should work when copy properties", () => {
+    const selectedBrick = {
+      uid: 1,
+    };
+    (useSelectedBrickContext as jest.Mock).mockReturnValue({ selectedBrick });
+    const wrapper = mount(<PropView />);
+    document.execCommand = jest.fn().mockReturnValue(true);
+    document.removeEventListener = jest.fn();
+    wrapper.find(Button).simulate("click");
+    expect(document.execCommand).toBeCalledWith("copy");
+    expect(document.removeEventListener).toHaveBeenCalled();
   });
 });
