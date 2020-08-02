@@ -1,11 +1,13 @@
 import {
+  EVALUATION_EDIT,
   HOOK_NAME,
   MESSAGE_SOURCE_DEVTOOLS,
   MESSAGE_SOURCE_HOOK,
+  MESSAGE_SOURCE_PANEL,
+  TRANSFORMATION_EDIT,
 } from "./shared/constants";
 
 let panelCreated = false;
-
 // Check to see if BrickNext has loaded once per second in case BrickNext is added
 // after page load
 const loadCheckInterval = setInterval(function () {
@@ -46,6 +48,17 @@ function createPanelForBricks(): void {
         }
       }
 
+      function onPanelMessage(event: MessageEvent): void {
+        if (
+          event?.data.source === MESSAGE_SOURCE_PANEL &&
+          [EVALUATION_EDIT, TRANSFORMATION_EDIT].includes(
+            event.data.payload?.type
+          )
+        ) {
+          port?.postMessage(event.data);
+        }
+      }
+
       port.onMessage.addListener(onPortMessage);
 
       chrome.devtools.panels.create(
@@ -53,8 +66,10 @@ function createPanelForBricks(): void {
         "",
         "build/panel.html",
         function (panel) {
+          // istanbul ignore next
           panel.onShown.addListener((win) => {
             panelWindow = win;
+            panelWindow.addEventListener("message", onPanelMessage);
           });
         }
       );

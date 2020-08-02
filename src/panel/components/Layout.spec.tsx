@@ -116,6 +116,45 @@ describe("Layout", () => {
     wrapper.unmount();
   });
 
+  it("should work for edit evaluations", async () => {
+    storageGetItem.mockReturnValue("Evaluations");
+    const wrapper = mount(<Layout />);
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "evaluation",
+            payload: {
+              id: 0,
+              result: "good",
+            },
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "re-evaluation",
+            payload: {
+              id: 0,
+              result: "new",
+            },
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(wrapper.text()).toBe("EvaluationsPanel (1)");
+    wrapper.unmount();
+  });
+
   it("should work for new transformations", async () => {
     storageGetItem.mockReturnValue("Transformations");
     const wrapper = mount(<Layout />);
@@ -126,6 +165,45 @@ describe("Layout", () => {
           payload: {
             type: "transformation",
             payload: "good",
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(wrapper.text()).toBe("TransformationsPanel (1)");
+    wrapper.unmount();
+  });
+
+  it("should work for edit transformations", async () => {
+    storageGetItem.mockReturnValue("Transformations");
+    const wrapper = mount(<Layout />);
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "transformation",
+            payload: {
+              result: "good",
+              id: 0,
+            },
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "re-transformation",
+            payload: {
+              id: 0,
+              result: "new",
+            },
           },
         },
         location.origin

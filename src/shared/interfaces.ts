@@ -26,6 +26,7 @@ export interface RuntimeBrick {
 
 export interface BrickElement extends HTMLElement {
   $$typeof?: "brick" | "provider" | "custom-template" | "native" | "invalid";
+  // eslint-disable-next-line @typescript-eslint/ban-types
   $$eventListeners?: [string, Function, any?][];
 }
 
@@ -50,13 +51,23 @@ export interface BrickInfo {
 
 export type BrowserTheme = "dark" | "light";
 
-export interface Evaluation {
+export interface EvaluationDetail {
   raw: string;
   context: Record<string, any>;
   result: any;
 }
 
+export interface Evaluation {
+  detail: EvaluationDetail;
+  id?: number;
+}
+
 export interface Transformation {
+  detail: TransformationDetail;
+  id?: number;
+}
+
+export interface TransformationDetail {
   transform: any;
   data: any;
   options: {

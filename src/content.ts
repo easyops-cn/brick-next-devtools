@@ -1,4 +1,9 @@
-import { MESSAGE_SOURCE_HOOK } from "./shared/constants";
+import {
+  MESSAGE_SOURCE_HOOK,
+  EVALUATION_EDIT,
+  TRANSFORMATION_EDIT,
+  MESSAGE_SOURCE_PANEL,
+} from "./shared/constants";
 
 function injectScript(file: string): void {
   const script = document.createElement("script");
@@ -15,6 +20,15 @@ function initPort(): void {
   });
   port.onDisconnect.addListener(() => {
     port = null;
+  });
+
+  port.onMessage.addListener((message) => {
+    if (
+      message.source === MESSAGE_SOURCE_PANEL &&
+      [EVALUATION_EDIT, TRANSFORMATION_EDIT].includes(message.payload?.type)
+    ) {
+      window.postMessage(message, "*");
+    }
   });
 }
 

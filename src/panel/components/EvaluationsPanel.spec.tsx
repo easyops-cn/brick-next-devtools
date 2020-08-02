@@ -11,20 +11,28 @@ const savePreserveLogs = jest.fn();
 (useEvaluationsContext as jest.Mock).mockReturnValue({
   evaluations: [
     {
-      raw: "<% EVENT.detail %>",
-      result: "good",
-      context: {
-        EVENT: {
-          detail: "good",
+      detail: {
+        raw: "<% EVENT.detail %>",
+        result: "good",
+        context: {
+          EVENT: {
+            detail: "good",
+          },
+          DATA: {
+            name: "easyops",
+          },
         },
       },
+      id: 0,
     },
     {
-      raw: "<% DATA.quality %>",
-      result: "better",
-      context: {
-        EVENT: {
-          detail: "better",
+      detail: {
+        raw: "<% DATA.quality %>",
+        result: "better",
+        context: {
+          EVENT: {
+            detail: "better",
+          },
         },
       },
     },
@@ -81,5 +89,33 @@ describe("EvaluationsPanel", () => {
     expect(wrapper.find(PropItem).at(0).prop("propValue")).toBe(
       "<% EVENT.detail %>"
     );
+  });
+
+  it("should post edited text message", () => {
+    const wrapper = shallow(<EvaluationsPanel />);
+    const postMessage = jest.spyOn(window, "postMessage");
+
+    wrapper.find(PropItem).at(0).invoke("overrideProps")(
+      "propName",
+      "propValue",
+      "<% DATA.name %>"
+    );
+
+    expect(postMessage.mock.calls[0][0]).toEqual({
+      payload: {
+        context: {
+          data: {
+            name: "easyops",
+          },
+          event: {
+            detail: "good",
+          },
+        },
+        id: 0,
+        raw: "<% DATA.name %>",
+        type: "devtools-evaluation-edit",
+      },
+      source: "brick-next-devtools-panel",
+    });
   });
 });

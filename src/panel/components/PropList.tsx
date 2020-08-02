@@ -8,7 +8,7 @@ import { isDehydrated, isObject } from "../libs/utils";
 interface PropListProps {
   list: any[] | Record<string, any>;
   editable?: boolean;
-  overrideProps?: (propName: string, propValue: string) => void;
+  overrideProps?: (propName: string, propValue: string, result?: any) => void;
 }
 
 export function PropList({
@@ -49,7 +49,7 @@ interface PropItemProps {
   propName?: string;
   standalone?: boolean;
   editable?: boolean;
-  overrideProps?: (propName: string, propValue: string) => void;
+  overrideProps?: (propName: string, propValue: string, result?: any) => void;
 }
 
 export function PropItem({
@@ -84,7 +84,7 @@ export function PropItem({
       } else {
         result = JSON.parse(changeValue);
       }
-      overrideProps?.(propName, changeValue);
+      overrideProps?.(propName, changeValue, result);
       setEditing(false);
       setError(false);
     } catch (error) {

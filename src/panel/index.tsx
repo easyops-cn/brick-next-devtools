@@ -1,7 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Layout } from "./components/Layout";
-import { MESSAGE_SOURCE_DEVTOOLS } from "../shared/constants";
+import {
+  MESSAGE_SOURCE_DEVTOOLS,
+  MESSAGE_SOURCE_PANEL,
+} from "../shared/constants";
 
 import "normalize.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
@@ -13,7 +16,7 @@ root.id = "root";
 document.body.appendChild(root);
 
 ReactDOM.render(<Layout />, root);
-
+// istanbul ignore next
 window.addEventListener("message", function onMessage(
   event: MessageEvent
 ): void {
