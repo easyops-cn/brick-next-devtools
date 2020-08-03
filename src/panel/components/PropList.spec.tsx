@@ -1,6 +1,6 @@
 import React from "react";
 import { shallow } from "enzyme";
-import { Icon } from "@blueprintjs/core";
+import { Icon, TextArea } from "@blueprintjs/core";
 import { PropList, PropItem } from "./PropList";
 import { PROP_DEHYDRATED } from "../../shared/constants";
 
@@ -76,10 +76,14 @@ describe("PropItem", () => {
     const wrapper = shallow(<PropItem propName="quality" propValue="good" />);
     expect(wrapper.hasClass("expanded")).toBe(false);
     expect(wrapper.find(Icon).prop("icon")).toBe("blank");
-    wrapper.find(".prop-item-label").invoke("onClick")(null);
+    wrapper.find('span[data-testid="prop-name-wrapper"]').invoke("onClick")(
+      null
+    );
     expect(wrapper.hasClass("expanded")).toBe(true);
     expect(wrapper.find(Icon).prop("icon")).toBe("blank");
-    wrapper.find(".prop-item-label").invoke("onClick")(null);
+    wrapper.find('span[data-testid="prop-name-wrapper"]').invoke("onClick")(
+      null
+    );
     expect(wrapper.hasClass("expanded")).toBe(false);
     expect(wrapper.find(Icon).prop("icon")).toBe("blank");
   });
@@ -88,7 +92,9 @@ describe("PropItem", () => {
     const wrapper = shallow(<PropItem propName="quality" propValue={[1]} />);
     expect(wrapper.find(PropList).length).toBe(0);
     expect(wrapper.find(Icon).prop("icon")).toBe("caret-right");
-    wrapper.find(".prop-item-label").invoke("onClick")(null);
+    wrapper.find('span[data-testid="prop-name-wrapper"]').invoke("onClick")(
+      null
+    );
     expect(wrapper.find(PropList).prop("list")).toEqual([1]);
     expect(wrapper.find(Icon).prop("icon")).toBe("caret-down");
   });
@@ -102,8 +108,51 @@ describe("PropItem", () => {
   it("should work for standalone with complex property value", () => {
     const wrapper = shallow(<PropItem propValue={[1]} standalone />);
     expect(wrapper.find(Icon).prop("icon")).toBe("caret-right");
-    wrapper.find(".prop-item-label").invoke("onClick")(null);
+    wrapper.find('span[data-testid="prop-name-wrapper"]').invoke("onClick")(
+      null
+    );
     expect(wrapper.find(PropList).prop("list")).toEqual([1]);
     expect(wrapper.find(Icon).prop("icon")).toBe("caret-down");
+    wrapper.find(".prop-value").invoke("onDoubleClick")({} as any);
+    expect(wrapper.find(TextArea).length).toBe(0);
+  });
+
+  it("should work when editable", () => {
+    const wrapper = shallow(
+      <PropItem propName="quality" propValue="good" editable />
+    );
+    expect(wrapper.find(TextArea).length).toBe(0);
+    wrapper.find(".prop-value").invoke("onDoubleClick")({} as any);
+    expect(wrapper.find(TextArea).length).toBe(1);
+    wrapper.find(TextArea).invoke("onChange")({
+      target: {
+        value: '"bad"',
+      },
+    } as any);
+    expect(wrapper.find(TextArea).prop("value")).toBe('"bad"');
+    wrapper.find(TextArea).invoke("onBlur")({} as any);
+    expect(wrapper.find(".bp3-intent-danger").length).toBe(0);
+    expect(wrapper.find(TextArea).length).toBe(0);
+
+    wrapper.find(".prop-value").invoke("onDoubleClick")({} as any);
+    wrapper.find(TextArea).invoke("onChange")({
+      target: {
+        value: "{a:errorJsonStringValue",
+      },
+    } as any);
+    expect(wrapper.find(TextArea).prop("value")).toBe(
+      "{a:errorJsonStringValue"
+    );
+    wrapper.find(TextArea).invoke("onBlur")({} as any);
+    expect(wrapper.find(".bp3-intent-danger").length).toBe(1);
+    expect(wrapper.find(TextArea).length).toBe(1);
+    wrapper.find(TextArea).invoke("onChange")({
+      target: {
+        value: undefined,
+      },
+    } as any);
+    expect(wrapper.find(TextArea).prop("value")).toBe(undefined);
+    wrapper.find(TextArea).invoke("onBlur")({} as any);
+    expect(wrapper.find(".bp3-intent-danger").length).toBe(0);
   });
 });

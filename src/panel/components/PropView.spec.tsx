@@ -56,10 +56,11 @@ describe("PropView", () => {
     expect(wrapper.find(PropList).at(0).prop("list")).toEqual({
       quality: "good",
     });
+    expect(wrapper.find(PropList).at(0).prop("editable")).toBe(true);
     expect(wrapper.find(PropList).at(1).prop("list")).toEqual([
       ["click", { action: "console.log" }],
     ]);
-
+    expect(wrapper.find(PropList).at(1).prop("editable")).toBe(false);
     (useSelectedBrickContext as jest.Mock).mockReset();
   });
 
@@ -74,5 +75,27 @@ describe("PropView", () => {
     wrapper.find(Button).simulate("click");
     expect(document.execCommand).toBeCalledWith("copy");
     expect(document.removeEventListener).toHaveBeenCalled();
+  });
+
+  it("should work when overrideProps", () => {
+    const selectedBrick = {
+      uid: 1,
+    };
+    (useSelectedBrickContext as jest.Mock).mockReturnValue({ selectedBrick });
+    const wrapper = mount(<PropView />);
+    expect(mockEval.mock.calls[0][0]).toBe(
+      "window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickInfo(1)"
+    );
+    const mockEvalOverrideProps = jest.fn();
+    (window as any).chrome = {
+      devtools: {
+        inspectedWindow: {
+          eval: mockEvalOverrideProps,
+        },
+      },
+    };
+    wrapper.find(PropList).at(0).invoke("overrideProps")("quality", "bad");
+    expect(mockEvalOverrideProps).toHaveBeenCalled();
+    (useSelectedBrickContext as jest.Mock).mockReset();
   });
 });

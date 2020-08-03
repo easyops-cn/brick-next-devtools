@@ -36,21 +36,36 @@ export function PropView(): React.ReactElement {
   const { selectedBrick } = useSelectedBrickContext();
   const [brickInfo, setBrickInfo] = React.useState<BrickInfo>({});
 
+  const handleBrickInfoChange = React.useCallback(() => {
+    chrome.devtools.inspectedWindow.eval(
+      `window.${HOOK_NAME}.getBrickInfo(${selectedBrick.uid})`,
+      function (result: DehydratedBrickInfo, error) {
+        // istanbul ignore if
+        if (error) {
+          console.error("getBrickInfo()", error, result);
+        }
+        setBrickInfo(hydrate(result.info, result.repo));
+      }
+    );
+  }, [selectedBrick]);
+
   React.useEffect(() => {
     if (selectedBrick) {
-      chrome.devtools.inspectedWindow.eval(
-        `window.${HOOK_NAME}.getBrickInfo(${selectedBrick.uid})`,
-        function (result: DehydratedBrickInfo, error) {
-          // istanbul ignore if
-          if (error) {
-            console.error("getBrickInfo()", error, result);
-          }
-
-          setBrickInfo(hydrate(result.info, result.repo));
-        }
-      );
+      handleBrickInfoChange();
     }
-  }, [selectedBrick]);
+  }, [selectedBrick, handleBrickInfoChange]);
+
+  const overrideProps = React.useCallback(
+    (propName: string, propValue: string) => {
+      // istanbul ignore else
+      if (selectedBrick) {
+        const evalParams = `window.${HOOK_NAME}.overrideProps(${selectedBrick.uid},"${propName}",${propValue})`;
+        chrome.devtools.inspectedWindow.eval(evalParams);
+        handleBrickInfoChange();
+      }
+    },
+    [selectedBrick, handleBrickInfoChange]
+  );
 
   if (!selectedBrick || !brickInfo) {
     return null;
@@ -87,7 +102,11 @@ export function PropView(): React.ReactElement {
                 )}
               </div>
               <div className="expanded">
-                <PropList list={brickInfo[key]} />
+                <PropList
+                  list={brickInfo[key]}
+                  overrideProps={overrideProps}
+                  editable={key !== "events"}
+                />
               </div>
             </React.Fragment>
           ))}
