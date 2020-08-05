@@ -1,5 +1,5 @@
 import React from "react";
-import { shallow } from "enzyme";
+import { shallow, mount } from "enzyme";
 import { Icon, TextArea } from "@blueprintjs/core";
 import { PropList, PropItem } from "./PropList";
 import { PROP_DEHYDRATED } from "../../shared/constants";
@@ -154,5 +154,17 @@ describe("PropItem", () => {
     expect(wrapper.find(TextArea).prop("value")).toBe(undefined);
     wrapper.find(TextArea).invoke("onBlur")({} as any);
     expect(wrapper.find(".bp3-intent-danger").length).toBe(0);
+  });
+
+  it("should set changeValue when propValue changes", () => {
+    const wrapper = mount(
+      <PropItem propName="quality" propValue="good" editable />
+    );
+    wrapper.find(".prop-value").invoke("onDoubleClick")({} as any);
+    wrapper.setProps({
+      propValue: "bad",
+    });
+    wrapper.update();
+    expect(wrapper.find(TextArea).prop("value")).toBe('"bad"');
   });
 });
