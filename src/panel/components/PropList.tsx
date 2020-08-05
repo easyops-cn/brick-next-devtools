@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import classNames from "classnames";
 import { Icon, TextArea } from "@blueprintjs/core";
 import { PROP_DEHYDRATED } from "../../shared/constants";
@@ -97,6 +97,10 @@ export function PropItem({
   };
 
   const hasChildren = isObject(propValue);
+
+  useEffect(() => {
+    setChangeValue(JSON.stringify(propValue, null, 2));
+  }, [propValue]);
 
   return React.createElement(
     standalone ? "div" : "li",
