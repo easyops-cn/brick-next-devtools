@@ -16,6 +16,11 @@ import { TransformationsContext } from "../libs/TransformationsContext";
 import { Storage } from "../libs/Storage";
 import { hydrate } from "../libs/hydrate";
 
+let uniqueIdCounter = 0;
+function getUniqueId(): number {
+  return (uniqueIdCounter += 1);
+}
+
 export function Layout(): React.ReactElement {
   const [selectedPanel, setSelectedPanel] = React.useState(
     Storage.getItem("selectedPanel") ?? "Bricks"
@@ -33,7 +38,26 @@ export function Layout(): React.ReactElement {
         event.data?.source === MESSAGE_SOURCE_HOOK &&
         ((data = event.data.payload), data?.type === "evaluation")
       ) {
-        setEvaluations((prev) => prev.concat(hydrate(data.payload, data.repo)));
+        setEvaluations((prev) =>
+          prev.concat({
+            detail: hydrate(data.payload, data.repo),
+            id: getUniqueId(),
+          })
+        );
+      }
+
+      if (
+        event.data?.source === MESSAGE_SOURCE_HOOK &&
+        ((data = event.data.payload), data?.type === "re-evaluation")
+      ) {
+        const value = hydrate(data.payload, data.repo);
+        const { id, ...changeData } = value;
+        setEvaluations((prev) => {
+          const selected = prev.find((item) => item.id === id);
+          selected && Object.assign(selected.detail, changeData);
+
+          return [...prev];
+        });
       }
     }
     window.addEventListener("message", onMessage);
@@ -48,8 +72,24 @@ export function Layout(): React.ReactElement {
         ((data = event.data.payload), data?.type === "transformation")
       ) {
         setTransformations((prev) =>
-          prev.concat(hydrate(data.payload, data.repo))
+          prev.concat({
+            detail: hydrate(data.payload, data.repo),
+            id: getUniqueId(),
+          })
         );
+      }
+
+      if (
+        event.data?.source === MESSAGE_SOURCE_HOOK &&
+        ((data = event.data.payload), data?.type === "re-transformation")
+      ) {
+        const value = hydrate(data.payload, data.repo);
+        const { id, ...changeData } = value;
+        setTransformations((prev) => {
+          const selected = prev.find((item) => item.id === id);
+          selected && Object.assign(selected.detail, changeData);
+          return [...prev];
+        });
       }
     }
     window.addEventListener("message", onMessage);

@@ -10,6 +10,8 @@ import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { PropList, PropItem } from "./PropList";
+import { EVALUATION_EDIT, MESSAGE_SOURCE_PANEL } from "../../shared/constants";
+import { Evaluation } from "../../shared/interfaces";
 
 export function EvaluationsPanel(): React.ReactElement {
   const {
@@ -37,7 +39,7 @@ export function EvaluationsPanel(): React.ReactElement {
       return evaluations;
     }
     return evaluations.filter((item) =>
-      item.raw.toLocaleLowerCase().includes(q.toLocaleLowerCase())
+      item.detail?.raw.toLocaleLowerCase().includes(q.toLocaleLowerCase())
     );
   }, [evaluations, q]);
 
@@ -54,6 +56,28 @@ export function EvaluationsPanel(): React.ReactElement {
     },
     [savePreserveLogs]
   );
+
+  const handleEvaluations = (item: Evaluation, value: string) => {
+    const {
+      context: { DATA, EVENT },
+    } = item.detail;
+
+    window.postMessage(
+      {
+        source: MESSAGE_SOURCE_PANEL,
+        payload: {
+          type: EVALUATION_EDIT,
+          context: {
+            data: DATA,
+            event: EVENT,
+          },
+          id: item.id,
+          raw: value,
+        },
+      },
+      "*"
+    );
+  };
 
   return (
     <div
@@ -103,13 +127,20 @@ export function EvaluationsPanel(): React.ReactElement {
               {filteredEvaluations.map((item, key) => (
                 <tr key={key}>
                   <td>
-                    <PropItem propValue={item.raw} standalone />
+                    <PropItem
+                      propValue={item.detail?.raw}
+                      standalone
+                      editable
+                      overrideProps={(_name, _prop, value) =>
+                        handleEvaluations(item, value)
+                      }
+                    />
                   </td>
                   <td>
-                    <PropItem propValue={item.result} standalone />
+                    <PropItem propValue={item.detail?.result} standalone />
                   </td>
                   <td>
-                    <PropList list={item.context || {}} />
+                    <PropList list={item.detail?.context || {}} />
                   </td>
                 </tr>
               ))}

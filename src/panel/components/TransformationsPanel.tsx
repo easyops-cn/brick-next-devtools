@@ -4,6 +4,11 @@ import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useTransformationsContext } from "../libs/TransformationsContext";
 import { PropItem } from "./PropList";
+import {
+  TRANSFORMATION_EDIT,
+  MESSAGE_SOURCE_PANEL,
+} from "../../shared/constants";
+import { Transformation } from "../../shared/interfaces";
 
 export function TransformationsPanel(): React.ReactElement {
   const {
@@ -31,6 +36,23 @@ export function TransformationsPanel(): React.ReactElement {
     },
     [savePreserveLogs]
   );
+
+  const handleTransform = (item: Transformation, value: any) => {
+    const { options, data } = item.detail;
+    window.postMessage(
+      {
+        source: MESSAGE_SOURCE_PANEL,
+        payload: {
+          type: TRANSFORMATION_EDIT,
+          options,
+          data,
+          id: item.id,
+          transform: value,
+        },
+      },
+      "*"
+    );
+  };
 
   return (
     <div
@@ -72,29 +94,38 @@ export function TransformationsPanel(): React.ReactElement {
               </tr>
             </thead>
             <tbody className="source-code">
-              {transformations.map((item, key) => (
-                <tr key={key}>
-                  <td>
-                    <PropItem propValue={item.transform} standalone />
-                  </td>
-                  <td>
-                    <PropItem propValue={item.result} standalone />
-                  </td>
-                  <td>
-                    <PropItem propValue={item.data} standalone />
-                  </td>
-                  <td>
-                    <PropItem
-                      propValue={Object.fromEntries(
-                        Object.entries(item.options).filter(
-                          (entry) => entry[1] !== undefined
-                        )
-                      )}
-                      standalone
-                    />
-                  </td>
-                </tr>
-              ))}
+              {transformations.map((item, key) => {
+                return (
+                  <tr key={key}>
+                    <td>
+                      <PropItem
+                        overrideProps={(_name, _prop, value) =>
+                          handleTransform(item, value)
+                        }
+                        propValue={item.detail?.transform}
+                        standalone
+                        editable
+                      />
+                    </td>
+                    <td>
+                      <PropItem propValue={item.detail?.result} standalone />
+                    </td>
+                    <td>
+                      <PropItem propValue={item.detail?.data} standalone />
+                    </td>
+                    <td>
+                      <PropItem
+                        propValue={Object.fromEntries(
+                          Object.entries(item.detail?.options).filter(
+                            (entry) => entry[1] !== undefined
+                          )
+                        )}
+                        standalone
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
