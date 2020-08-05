@@ -18,6 +18,12 @@ function injectHook(): void {
     emit,
     overrideProps: (uid: number, propertyName: string, value: any) =>
       overrideProps(getBrickByUid(uid), propertyName, value),
+    supports: (...features: string[]) =>
+      Array.isArray((window as any).BRICK_NEXT_FEATURES)
+        ? features.every((item) =>
+            (window as any).BRICK_NEXT_FEATURES.includes(item)
+          )
+        : false,
   };
 
   Object.defineProperty(hook, "pageHasBricks", {

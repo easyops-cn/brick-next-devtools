@@ -1,6 +1,6 @@
 import React from "react";
 import { shallow } from "enzyme";
-import { Button, InputGroup, Switch } from "@blueprintjs/core";
+import { Button, InputGroup } from "@blueprintjs/core";
 import { EvaluationsPanel } from "./EvaluationsPanel";
 import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { PropItem } from "./PropList";

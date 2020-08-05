@@ -10,8 +10,13 @@ import classNames from "classnames";
 import { PanelSelector } from "./PanelSelector";
 import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { PropList, PropItem } from "./PropList";
-import { EVALUATION_EDIT, MESSAGE_SOURCE_PANEL } from "../../shared/constants";
+import {
+  EVALUATION_EDIT,
+  MESSAGE_SOURCE_PANEL,
+  EDIT_EVALUATIONS_AND_TRANSFORMATIONS_IN_DEVTOOLS,
+} from "../../shared/constants";
 import { Evaluation } from "../../shared/interfaces";
+import { useSupports } from "../libs/useSupports";
 
 export function EvaluationsPanel(): React.ReactElement {
   const {
@@ -22,6 +27,9 @@ export function EvaluationsPanel(): React.ReactElement {
   } = useEvaluationsContext();
   const [stringWrap, setStringWrap] = React.useState(false);
   const [q, setQ] = React.useState<string>();
+  const editable = useSupports(
+    EDIT_EVALUATIONS_AND_TRANSFORMATIONS_IN_DEVTOOLS
+  );
 
   const handleClear = React.useCallback(() => {
     setEvaluations([]);
@@ -57,7 +65,7 @@ export function EvaluationsPanel(): React.ReactElement {
     [savePreserveLogs]
   );
 
-  const handleEvaluations = (item: Evaluation, value: string) => {
+  const handleEvaluations = (item: Evaluation, value: string): void => {
     const {
       context: { DATA, EVENT },
     } = item.detail;
@@ -120,7 +128,7 @@ export function EvaluationsPanel(): React.ReactElement {
               <tr>
                 <th>Expression</th>
                 <th>Result</th>
-                <th>Context</th>
+                <th>Scope</th>
               </tr>
             </thead>
             <tbody className="source-code">
@@ -130,7 +138,7 @@ export function EvaluationsPanel(): React.ReactElement {
                     <PropItem
                       propValue={item.detail?.raw}
                       standalone
-                      editable
+                      editable={editable}
                       overrideProps={(_name, _prop, value) =>
                         handleEvaluations(item, value)
                       }
