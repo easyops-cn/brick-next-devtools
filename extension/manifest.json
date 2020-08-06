@@ -3,7 +3,7 @@
 
   "name": "Brick Next Developer Tools",
   "description": "Adds Brick Next debugging tools to the Chrome Developer Tools.",
-  "version": "0.5.0",
+  "version": "0.6.0",
 
   "icons": {
     "128": "icons/128-production.png"
