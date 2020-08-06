@@ -11,6 +11,7 @@ const savePreserveLogs = jest.fn();
 (useTransformationsContext as jest.Mock).mockReturnValue({
   transformations: [
     {
+      id: 1,
       detail: {
         transform: "quality",
         result: {
@@ -22,7 +23,17 @@ const savePreserveLogs = jest.fn();
           mapArray: undefined,
         },
       },
-      id: 1,
+    },
+    {
+      id: 2,
+      detail: {
+        transform: {
+          quality: "<% DATA() %>",
+        },
+        data: "good",
+        options: {},
+      },
+      error: "DATA is not a function",
     },
   ],
   setTransformations,
@@ -36,7 +47,10 @@ describe("TransformationsPanel", () => {
 
   it("should work", () => {
     const wrapper = shallow(<TransformationsPanel />);
-    expect(wrapper.find("tbody").find("tr").length).toBe(1);
+    expect(wrapper.find("tbody").find("tr").length).toBe(2);
+    expect(wrapper.find("tbody").find("tr").at(1).find("td").at(1).text()).toBe(
+      "Error: DATA is not a function"
+    );
   });
 
   it("should toggle string-wrap", () => {

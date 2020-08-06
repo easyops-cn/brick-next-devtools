@@ -3,6 +3,7 @@ import { getBricks, getBrickByUid, getBrickInfo } from "./traverse";
 import { inspectElement, dismissInspections } from "./inspector";
 import { emit } from "./emit";
 import { overrideProps } from "./overrideProps";
+import { restoreDehydrated } from "./dehydrate";
 
 function injectHook(): void {
   if (Object.prototype.hasOwnProperty.call(window, HOOK_NAME)) {
@@ -15,7 +16,6 @@ function injectHook(): void {
     getBrickInfo,
     inspectBrick: (uid: number) => inspectElement(getBrickByUid(uid)),
     dismissInspections,
-    emit,
     overrideProps: (uid: number, propertyName: string, value: any) =>
       overrideProps(getBrickByUid(uid), propertyName, value),
     supports: (...features: string[]) =>
@@ -24,6 +24,9 @@ function injectHook(): void {
             (window as any).BRICK_NEXT_FEATURES.includes(item)
           )
         : false,
+    // Methods below are exposed to Brick Next itself, keep compatible.
+    emit,
+    restoreDehydrated,
   };
 
   Object.defineProperty(hook, "pageHasBricks", {

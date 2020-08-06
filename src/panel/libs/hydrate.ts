@@ -16,12 +16,12 @@ function noop(): void {
  * @returns re-hydrated data
  */
 export function hydrate(
-  value: any,
+  value: unknown,
   repo: any[],
   memo = new Map<number, any>(),
   ref?: number
 ): any {
-  const dehydrated: Dehydrated = value?.[PROP_DEHYDRATED];
+  const dehydrated: Dehydrated = (value as any)?.[PROP_DEHYDRATED];
   if (dehydrated) {
     switch (dehydrated.type) {
       case "ref":

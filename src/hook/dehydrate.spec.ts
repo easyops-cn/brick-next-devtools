@@ -1,4 +1,4 @@
-import { dehydrate } from "./dehydrate";
+import { dehydrate, restoreDehydrated } from "./dehydrate";
 import { PROP_DEHYDRATED } from "../shared/constants";
 
 describe("dehydrate", () => {
@@ -206,4 +206,30 @@ describe("dehydrate", () => {
       expect(repo).toEqual(expectedRepo);
     }
   );
+});
+
+describe("restoreDehydrated", () => {
+  it("should restore dehydrated CustomEvent", () => {
+    const dehydratedCustomEvent = dehydrate(
+      new CustomEvent("something.happen", {
+        detail: {
+          quality: "good",
+        },
+      }),
+      []
+    );
+    const restoredCustomEvent = restoreDehydrated(dehydratedCustomEvent);
+    expect(restoredCustomEvent instanceof CustomEvent).toBe(true);
+    expect(restoredCustomEvent.type).toBe("something.happen");
+    expect(restoredCustomEvent.detail).toEqual({
+      quality: "good",
+    });
+  });
+
+  it("should restore dehydrated Event", () => {
+    const dehydratedCustomEvent = dehydrate(new Event("something.happen"), []);
+    const restoredCustomEvent = restoreDehydrated(dehydratedCustomEvent);
+    expect(restoredCustomEvent instanceof Event).toBe(true);
+    expect(restoredCustomEvent.type).toBe("something.happen");
+  });
 });

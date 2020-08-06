@@ -230,3 +230,8 @@ body {
 .table-view td > .prop-list {
   padding-left: 0;
 }
+
+.bp3-code.error-message {
+  color: #f5498b;
+  font-size: inherit;
+}
