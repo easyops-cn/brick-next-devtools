@@ -76,7 +76,7 @@ export function PropItem({
     }
   }, [editable]);
 
-  const handleBlur = () => {
+  const handleBlur = (): void => {
     try {
       let result;
       if (changeValue === "" || changeValue === undefined) {
@@ -92,7 +92,7 @@ export function PropItem({
     }
   };
 
-  const handleChange = (v) => {
+  const handleChange = (v: React.ChangeEvent<HTMLTextAreaElement>): void => {
     setChangeValue(v.target?.value);
   };
 

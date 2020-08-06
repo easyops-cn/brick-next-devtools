@@ -22,5 +22,11 @@ describe("hook", () => {
     expect(hook.pageHasBricks).toBe(false);
     (window as any).BRICK_NEXT_VERSIONS = {};
     expect(hook.pageHasBricks).toBe(true);
+    expect(hook.supports("good")).toBe(false);
+    (window as any).BRICK_NEXT_FEATURES = ["good", "better"];
+    expect(hook.supports("good")).toBe(true);
+    expect(hook.supports("good", "better")).toBe(true);
+    expect(hook.supports("good", "bad")).toBe(false);
+    expect(hook.supports("bad")).toBe(false);
   });
 });

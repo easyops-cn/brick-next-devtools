@@ -5,3 +5,5 @@ export const MESSAGE_SOURCE_PANEL = "brick-next-devtools-panel";
 export const PROP_DEHYDRATED = "$$brickNextDevtoolsDehydrated";
 export const EVALUATION_EDIT = "devtools-evaluation-edit";
 export const TRANSFORMATION_EDIT = "devtools-transformation-edit";
+export const EDIT_EVALUATIONS_AND_TRANSFORMATIONS_IN_DEVTOOLS =
+  "edit-evaluations-and-transformations-in-devtools";

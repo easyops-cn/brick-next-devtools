@@ -7,8 +7,10 @@ import { PropItem } from "./PropList";
 import {
   TRANSFORMATION_EDIT,
   MESSAGE_SOURCE_PANEL,
+  EDIT_EVALUATIONS_AND_TRANSFORMATIONS_IN_DEVTOOLS,
 } from "../../shared/constants";
 import { Transformation } from "../../shared/interfaces";
+import { useSupports } from "../libs/useSupports";
 
 export function TransformationsPanel(): React.ReactElement {
   const {
@@ -18,6 +20,9 @@ export function TransformationsPanel(): React.ReactElement {
     savePreserveLogs,
   } = useTransformationsContext();
   const [stringWrap, setStringWrap] = React.useState(false);
+  const editable = useSupports(
+    EDIT_EVALUATIONS_AND_TRANSFORMATIONS_IN_DEVTOOLS
+  );
 
   const handleClear = React.useCallback(() => {
     setTransformations([]);
@@ -37,7 +42,7 @@ export function TransformationsPanel(): React.ReactElement {
     [savePreserveLogs]
   );
 
-  const handleTransform = (item: Transformation, value: any) => {
+  const handleTransform = (item: Transformation, value: any): void => {
     const { options, data } = item.detail;
     window.postMessage(
       {
@@ -104,7 +109,7 @@ export function TransformationsPanel(): React.ReactElement {
                         }
                         propValue={item.detail?.transform}
                         standalone
-                        editable
+                        editable={editable}
                       />
                     </td>
                     <td>
