@@ -139,6 +139,7 @@ export function EvaluationsPanel(): React.ReactElement {
                       propValue={item.detail?.raw}
                       standalone
                       editable={editable}
+                      editAsString={typeof item.detail?.raw === "string"}
                       overrideProps={(_name, _prop, value) =>
                         handleEvaluations(item, value)
                       }

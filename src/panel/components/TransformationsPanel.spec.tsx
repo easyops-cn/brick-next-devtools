@@ -1,6 +1,6 @@
 import React from "react";
 import { shallow } from "enzyme";
-import { Button, Switch } from "@blueprintjs/core";
+import { Button } from "@blueprintjs/core";
 import { TransformationsPanel } from "./TransformationsPanel";
 import { useTransformationsContext } from "../libs/TransformationsContext";
 import { PropItem } from "./PropList";

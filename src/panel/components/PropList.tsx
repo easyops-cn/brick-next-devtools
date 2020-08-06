@@ -49,6 +49,7 @@ interface PropItemProps {
   propName?: string;
   standalone?: boolean;
   editable?: boolean;
+  editAsString?: boolean;
   overrideProps?: (propName: string, propValue: string, result?: any) => void;
 }
 
@@ -57,12 +58,13 @@ export function PropItem({
   propName,
   standalone,
   editable,
+  editAsString,
   overrideProps,
 }: PropItemProps): React.ReactElement {
   const [expanded, setExpanded] = React.useState(false);
   const [editing, setEditing] = React.useState(false);
   const [changeValue, setChangeValue] = React.useState(
-    JSON.stringify(propValue, null, 2)
+    editAsString ? propValue : JSON.stringify(propValue, null, 2)
   );
   const [error, setError] = React.useState(false);
 
@@ -79,7 +81,9 @@ export function PropItem({
   const handleBlur = (): void => {
     try {
       let result;
-      if (changeValue === "" || changeValue === undefined) {
+      if (editAsString) {
+        result = changeValue || "";
+      } else if (changeValue === "" || changeValue === undefined) {
         result = undefined;
       } else {
         result = JSON.parse(changeValue);
@@ -99,8 +103,10 @@ export function PropItem({
   const hasChildren = isObject(propValue);
 
   useEffect(() => {
-    setChangeValue(JSON.stringify(propValue, null, 2));
-  }, [propValue]);
+    setChangeValue(
+      editAsString ? propValue : JSON.stringify(propValue, null, 2)
+    );
+  }, [editAsString, propValue]);
 
   return React.createElement(
     standalone ? "div" : "li",
