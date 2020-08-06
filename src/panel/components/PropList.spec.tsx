@@ -167,4 +167,35 @@ describe("PropItem", () => {
     wrapper.update();
     expect(wrapper.find(TextArea).prop("value")).toBe('"bad"');
   });
+
+  it("should work for editing as string", () => {
+    const wrapper = mount(
+      <PropItem
+        propName="quality"
+        propValue="<% good %>"
+        editable
+        editAsString
+      />
+    );
+
+    expect(wrapper.find(TextArea).length).toBe(0);
+    wrapper.find(".prop-value").invoke("onDoubleClick")({} as any);
+    expect(wrapper.find(TextArea).length).toBe(1);
+    wrapper.find(TextArea).invoke("onChange")({
+      target: {
+        value: "<% better %>",
+      },
+    } as any);
+    expect(wrapper.find(TextArea).prop("value")).toBe("<% better %>");
+    wrapper.find(TextArea).invoke("onBlur")({} as any);
+    expect(wrapper.find(".bp3-intent-danger").length).toBe(0);
+    expect(wrapper.find(TextArea).length).toBe(0);
+
+    wrapper.find(".prop-value").invoke("onDoubleClick")({} as any);
+    wrapper.setProps({
+      propValue: "<% almost.perfect %>",
+    });
+    wrapper.update();
+    expect(wrapper.find(TextArea).prop("value")).toBe("<% almost.perfect %>");
+  });
 });
