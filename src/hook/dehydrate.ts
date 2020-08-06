@@ -9,9 +9,13 @@ import { PROP_DEHYDRATED } from "../shared/constants";
  * @param repo  repository to collect circular references.
  * @returns original value if it's serializable, or a dehydrated wrapper if not.
  */
-export function dehydrate(value: any, repo: any[], memo = new WeakMap()): any {
-  if (memo.has(value)) {
-    const processed = memo.get(value);
+export function dehydrate(
+  value: unknown,
+  repo: any[],
+  memo = new WeakMap()
+): any {
+  if (memo.has(value as any)) {
+    const processed = memo.get(value as any);
     let repoIndex = repo.indexOf(processed);
     if (repoIndex < 0) {
       repoIndex = repo.length;
@@ -92,6 +96,22 @@ export function dehydrate(value: any, repo: any[], memo = new WeakMap()): any {
     });
   }
 
+  return value;
+}
+
+// This API is exposed to Brick Next itself, keep compatible.
+export function restoreDehydrated(value: unknown): any {
+  const dehydrated: Dehydrated = (value as any)?.[PROP_DEHYDRATED];
+  if (dehydrated && dehydrated.type === "object" && dehydrated.children) {
+    if (dehydrated.constructorName === "CustomEvent") {
+      return new CustomEvent(dehydrated.children.type, {
+        detail: dehydrated.children.detail,
+      });
+    }
+    if (dehydrated.constructorName === "Event") {
+      return new Event(dehydrated.children.type);
+    }
+  }
   return value;
 }
 

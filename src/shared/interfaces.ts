@@ -58,13 +58,15 @@ export interface EvaluationDetail {
 }
 
 export interface Evaluation {
+  id: number;
   detail: EvaluationDetail;
-  id?: number;
+  error?: string;
 }
 
 export interface Transformation {
+  id: number;
   detail: TransformationDetail;
-  id?: number;
+  error?: string;
 }
 
 export interface TransformationDetail {

@@ -51,15 +51,12 @@ export function Layout(): React.ReactElement {
         ((data = event.data.payload), data?.type === "re-evaluation")
       ) {
         const value = hydrate(data.payload, data.repo);
-        const { id, raw, result } = value;
         setEvaluations((prev) => {
-          const selected = prev.find((item) => item.id === id);
-          selected &&
-            Object.assign(selected.detail, {
-              raw,
-              result: result.error ? `ERROR: ${result.error}` : result.data,
-            });
-
+          const selected = prev.find((item) => item.id === value.id);
+          if (selected) {
+            selected.detail = value.detail;
+            selected.error = value.error;
+          }
           return [...prev];
         });
       }
@@ -88,14 +85,12 @@ export function Layout(): React.ReactElement {
         ((data = event.data.payload), data?.type === "re-transformation")
       ) {
         const value = hydrate(data.payload, data.repo);
-        const { id, transform, result } = value;
         setTransformations((prev) => {
-          const selected = prev.find((item) => item.id === id);
-          selected &&
-            Object.assign(selected.detail, {
-              transform,
-              result: result.error ? `ERROR: ${result.error}` : result.data,
-            });
+          const selected = prev.find((item) => item.id === value.id);
+          if (selected) {
+            selected.detail = value.detail;
+            selected.error = value.error;
+          }
           return [...prev];
         });
       }

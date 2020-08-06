@@ -113,7 +113,13 @@ export function TransformationsPanel(): React.ReactElement {
                       />
                     </td>
                     <td>
-                      <PropItem propValue={item.detail?.result} standalone />
+                      {item.error ? (
+                        <code className="bp3-code error-message">
+                          Error: {item.error}
+                        </code>
+                      ) : (
+                        <PropItem propValue={item.detail?.result} standalone />
+                      )}
                     </td>
                     <td>
                       <PropItem propValue={item.detail?.data} standalone />

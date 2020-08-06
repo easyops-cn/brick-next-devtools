@@ -11,6 +11,7 @@ const savePreserveLogs = jest.fn();
 (useEvaluationsContext as jest.Mock).mockReturnValue({
   evaluations: [
     {
+      id: 1,
       detail: {
         raw: "<% EVENT.detail %>",
         result: "good",
@@ -23,7 +24,6 @@ const savePreserveLogs = jest.fn();
           },
         },
       },
-      id: 0,
     },
     {
       detail: {
@@ -35,6 +35,14 @@ const savePreserveLogs = jest.fn();
           },
         },
       },
+    },
+    {
+      id: 2,
+      detail: {
+        raw: "<% DATA.quality %>",
+        context: {},
+      },
+      error: "DATA is undefined",
     },
   ],
   setEvaluations,
@@ -48,7 +56,10 @@ describe("EvaluationsPanel", () => {
 
   it("should work", () => {
     const wrapper = shallow(<EvaluationsPanel />);
-    expect(wrapper.find("tbody").find("tr").length).toBe(2);
+    expect(wrapper.find("tbody").find("tr").length).toBe(3);
+    expect(wrapper.find("tbody").find("tr").at(2).find("td").at(1).text()).toBe(
+      "Error: DATA is undefined"
+    );
   });
 
   it("should toggle string-wrap", () => {
@@ -111,7 +122,7 @@ describe("EvaluationsPanel", () => {
             detail: "good",
           },
         },
-        id: 0,
+        id: 1,
         raw: "<% DATA.name %>",
         type: "devtools-evaluation-edit",
       },
