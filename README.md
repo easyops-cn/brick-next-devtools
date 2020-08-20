@@ -42,6 +42,7 @@ npm test src/some-file.spec.ts -- --no-collect-coverage-from
 ## Publish
 
 ```
+npm run release
 npm run build
 npm run zip
 ```
