@@ -8,9 +8,14 @@
     "zip": "zip -r extension.zip extension",
     "coveralls": "coveralls < .coverage/lcov.info"
   },
-  "browserslist": [
-    "last 2 Chrome versions"
-  ],
+  "browserslist": {
+    "development": [
+      "last 2 Chrome versions"
+    ],
+    "production": [
+      "chrome >= 57"
+    ]
+  },
   "dependencies": {
     "@blueprintjs/core": "^3.24.0",
     "classnames": "^2.2.6",

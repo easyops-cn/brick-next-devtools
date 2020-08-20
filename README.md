@@ -11,6 +11,10 @@ npm start
 
 Follow [official tutorial](https://developer.chrome.com/extensions/getstarted), when loading unpacked extension, choose the `brick-next-devtools/extension` directory.
 
+## Supported Browsers
+
+Supports Chrome >= 57 in production, and last 2 Chrome versions in development.
+
 ## Testing
 
 ```
