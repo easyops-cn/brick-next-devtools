@@ -1,10 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Layout } from "./components/Layout";
-import {
-  MESSAGE_SOURCE_DEVTOOLS,
-  MESSAGE_SOURCE_PANEL,
-} from "../shared/constants";
+import { MESSAGE_SOURCE_DEVTOOLS } from "../shared/constants";
 
 import "normalize.css";
 import "@blueprintjs/core/lib/css/blueprint.css";

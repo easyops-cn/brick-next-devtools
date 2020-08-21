@@ -4,16 +4,13 @@
     "sourceMap": true,
     "importHelpers": true,
     "moduleResolution": "node",
-    "resolveJsonModule": true,
     "esModuleInterop": true,
     "target": "ESNext",
     "module": "ESNext",
     "skipLibCheck": true,
     "strict": true,
     "strictNullChecks": false,
-    "jsx": "preserve",
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true
+    "jsx": "preserve"
   },
-  "exclude": ["node_modules", "extension/", "**/__mocks__/"]
+  "include": ["src"]
 }

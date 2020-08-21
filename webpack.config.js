@@ -32,8 +32,13 @@ module.exports = {
         test: /\.(ts|js)x?$/,
         exclude: /node_modules/,
         loader: "babel-loader",
+        // Todo(steve): remove these plugins after update webpack@5
+        // Ref https://github.com/webpack/webpack/issues/10227
         options: {
-          rootMode: "upward",
+          plugins: [
+            "@babel/plugin-proposal-optional-chaining",
+            "@babel/plugin-proposal-nullish-coalescing-operator",
+          ],
         },
       },
       {
