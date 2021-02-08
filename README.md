@@ -1,6 +1,6 @@
 # Brick Next Developer Tools [![CI Status](https://github.com/easyops-cn/brick-next-devtools/workflows/CI/badge.svg?event=push)](https://github.com/easyops-cn/brick-next-devtools/actions?query=workflow%3ACI) [![Coverage Status](https://coveralls.io/repos/github/easyops-cn/brick-next-devtools/badge.svg?branch=master)](https://coveralls.io/github/easyops-cn/brick-next-devtools)
 
-A Chrome devtools extension for Brick Next developers.
+A Chrome devtools extension for Brick Next developers. [Check it out on Chrome Webstore](https://chrome.google.com/webstore/detail/brick-next-developer-tool/imfbjbfcldgkdbfgeoppalofbjfihpdp).
 
 ## Development
 
