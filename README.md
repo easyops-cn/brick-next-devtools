@@ -2,6 +2,8 @@
 
 A Chrome devtools extension for Brick Next developers. [Check it out on Chrome Webstore](https://chrome.google.com/webstore/detail/brick-next-developer-tool/imfbjbfcldgkdbfgeoppalofbjfihpdp).
 
+![Extension screenshot](./devtools.jpg)
+
 ## Development
 
 ```
