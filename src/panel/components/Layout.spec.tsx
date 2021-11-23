@@ -1,6 +1,6 @@
 import React from "react";
 import { act } from "react-dom/test-utils";
-import { shallow, mount } from "enzyme";
+import { mount } from "enzyme";
 import { Layout } from "./Layout";
 import { Storage } from "../libs/Storage";
 import { BricksPanel } from "./BricksPanel";
@@ -63,23 +63,28 @@ describe("Layout", () => {
   });
 
   it("should work as default theme", () => {
-    const wrapper = shallow(<Layout />);
-    expect(wrapper.hasClass("bp3-dark")).toBe(false);
+    const wrapper = mount(<Layout />);
+    expect(document.documentElement.dataset.theme).toBe("light");
+    expect(wrapper.childAt(0).hasClass("bp3-dark")).toBe(false);
     expect(wrapper.find(BricksPanel).length).toBe(1);
     expect(wrapper.find(EvaluationsPanel).length).toBe(0);
     expect(wrapper.find(TransformationsPanel).length).toBe(0);
+    wrapper.unmount();
   });
 
   it("should work as dark theme", () => {
     mockPanels.themeName = "dark";
-    const wrapper = shallow(<Layout />);
-    expect(wrapper.hasClass("bp3-dark")).toBe(true);
+    const wrapper = mount(<Layout />);
+    expect(document.documentElement.dataset.theme).toBe("dark");
+    expect(wrapper.childAt(0).hasClass("bp3-dark")).toBe(true);
+    wrapper.unmount();
   });
 
   it("should work for bricks panel", () => {
     const wrapper = mount(<Layout />);
     expect(wrapper.text()).toBe("BricksPanel");
     expect(storageSetItem).toBeCalledWith("selectedPanel", "Bricks");
+    wrapper.unmount();
   });
 
   it("should work for evaluations panel", () => {
@@ -87,6 +92,7 @@ describe("Layout", () => {
     const wrapper = mount(<Layout />);
     expect(wrapper.text()).toBe("EvaluationsPanel (0)");
     expect(storageSetItem).toBeCalledWith("selectedPanel", "Evaluations");
+    wrapper.unmount();
   });
 
   it("should work for transformations panel", () => {
@@ -94,6 +100,7 @@ describe("Layout", () => {
     const wrapper = mount(<Layout />);
     expect(wrapper.text()).toBe("TransformationsPanel (0)");
     expect(storageSetItem).toBeCalledWith("selectedPanel", "Transformations");
+    wrapper.unmount();
   });
 
   it("should work for new evaluations", async () => {
