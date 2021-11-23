@@ -120,6 +120,10 @@ export function Layout(): React.ReactElement {
 
   const theme = chrome.devtools.panels.themeName === "dark" ? "dark" : "light";
 
+  React.useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
   return (
     <div
       className={classNames("layout bp3-focus-disabled", {
