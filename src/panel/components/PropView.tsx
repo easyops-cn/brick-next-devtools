@@ -8,7 +8,7 @@ import { PropList } from "./PropList";
 
 const copyToClipboard = (text: string): void => {
   // istanbul ignore next
-  const listener = (e: ClipboardEvent) => {
+  const listener = (e: ClipboardEvent): void => {
     e.stopPropagation();
     const clipboard = e.clipboardData;
     clipboard.clearData();
@@ -44,7 +44,22 @@ export function PropView(): React.ReactElement {
         if (error) {
           console.error("getBrickInfo()", error, result);
         }
-        setBrickInfo(hydrate(result.info, result.repo));
+        const newBrickInfo = hydrate(result.info, result.repo);
+        const eventsMap = new Map();
+        if (newBrickInfo && Array.isArray(newBrickInfo.events)) {
+          for (const [eventType, eventHandler] of newBrickInfo.events) {
+            const existedHandler = eventsMap.get(eventType);
+            if (existedHandler === undefined) {
+              eventsMap.set(eventType, eventHandler);
+            } else if (Array.isArray(existedHandler)) {
+              existedHandler.push(existedHandler);
+            } else {
+              eventsMap.set(eventType, [existedHandler, eventHandler]);
+            }
+          }
+        }
+        newBrickInfo.events = Object.fromEntries(eventsMap.entries());
+        setBrickInfo(newBrickInfo);
       }
     );
   }, [selectedBrick]);
@@ -71,9 +86,9 @@ export function PropView(): React.ReactElement {
     return null;
   }
 
-  const handleCopyProps = () => {
+  const handleCopyFactory = (key: "properties" | "events") => (): void => {
     try {
-      const propsText = JSON.stringify(brickInfo.properties, null, 2);
+      const propsText = JSON.stringify(brickInfo[key], null, 2);
       copyToClipboard(propsText);
     } catch (error) {
       // do nothing
@@ -89,12 +104,12 @@ export function PropView(): React.ReactElement {
             <React.Fragment key={tag}>
               <div style={{ padding: 5 }}>
                 <Tag minimal>{tag}</Tag>
-                {key === "properties" && (
+                {(key === "properties" || key === "events") && (
                   <Tooltip content="Copy to clipboard" hoverOpenDelay={300}>
                     <Button
                       icon="duplicate"
                       minimal
-                      onClick={handleCopyProps}
+                      onClick={handleCopyFactory(key)}
                       style={{ marginLeft: "10px" }}
                       small
                     />
