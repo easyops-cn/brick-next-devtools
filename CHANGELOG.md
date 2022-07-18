@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.3](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.2...v0.6.3) (2022-07-18)
+
+### Features
+
+- copy events ([f035d35](https://github.com/easyops-cn/brick-next-devtools/commit/f035d35b7b968a986d6b7fd89e506f780dfe1052))
+
 ### [0.6.2](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.1...v0.6.2) (2021-11-23)
 
 ### Features
