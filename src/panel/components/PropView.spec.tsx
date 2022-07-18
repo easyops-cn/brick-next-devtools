@@ -57,9 +57,9 @@ describe("PropView", () => {
       quality: "good",
     });
     expect(wrapper.find(PropList).at(0).prop("editable")).toBe(true);
-    expect(wrapper.find(PropList).at(1).prop("list")).toEqual([
-      ["click", { action: "console.log" }],
-    ]);
+    expect(wrapper.find(PropList).at(1).prop("list")).toEqual({
+      click: { action: "console.log" },
+    });
     expect(wrapper.find(PropList).at(1).prop("editable")).toBe(false);
     (useSelectedBrickContext as jest.Mock).mockReset();
   });
@@ -72,7 +72,8 @@ describe("PropView", () => {
     const wrapper = mount(<PropView />);
     document.execCommand = jest.fn().mockReturnValue(true);
     document.removeEventListener = jest.fn();
-    wrapper.find(Button).simulate("click");
+    expect(wrapper.find(Button).length).toBe(2);
+    wrapper.find(Button).at(0).simulate("click");
     expect(document.execCommand).toBeCalledWith("copy");
     expect(document.removeEventListener).toHaveBeenCalled();
   });
