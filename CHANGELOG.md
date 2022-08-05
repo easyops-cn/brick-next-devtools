@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.4](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.3...v0.6.4) (2022-08-05)
+
+### Bug Fixes
+
+- do not stringify prop when it's not editable ([46e345a](https://github.com/easyops-cn/brick-next-devtools/commit/46e345a3aaa29b4435b0b0adc374527be6151fcc))
+
 ### [0.6.3](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.2...v0.6.3) (2022-07-18)
 
 ### Features
