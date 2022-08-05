@@ -63,10 +63,21 @@ export function PropItem({
 }: PropItemProps): React.ReactElement {
   const [expanded, setExpanded] = React.useState(false);
   const [editing, setEditing] = React.useState(false);
-  const [changeValue, setChangeValue] = React.useState(
-    editAsString ? propValue : JSON.stringify(propValue, null, 2)
-  );
+
+  const initialChangeValue = React.useMemo(() => {
+    return editable
+      ? editAsString
+        ? propValue
+        : JSON.stringify(propValue, null, 2)
+      : null;
+  }, [editable, editAsString, propValue]);
+
+  const [changeValue, setChangeValue] = React.useState(initialChangeValue);
   const [error, setError] = React.useState(false);
+
+  useEffect(() => {
+    setChangeValue(initialChangeValue);
+  }, [initialChangeValue]);
 
   const handleClick = React.useCallback(() => {
     setExpanded(!expanded);
@@ -101,12 +112,6 @@ export function PropItem({
   };
 
   const hasChildren = isObject(propValue);
-
-  useEffect(() => {
-    setChangeValue(
-      editAsString ? propValue : JSON.stringify(propValue, null, 2)
-    );
-  }, [editAsString, propValue]);
 
   return React.createElement(
     standalone ? "div" : "li",

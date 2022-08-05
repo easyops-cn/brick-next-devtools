@@ -117,6 +117,20 @@ describe("PropItem", () => {
     expect(wrapper.find(TextArea).length).toBe(0);
   });
 
+  it("should work for standalone with circular property value", () => {
+    const a: { b?: unknown } = {};
+    a.b = a;
+    const wrapper = shallow(<PropItem propValue={a} standalone />);
+    expect(wrapper.find(Icon).prop("icon")).toBe("caret-right");
+    wrapper.find('span[data-testid="prop-name-wrapper"]').invoke("onClick")(
+      null
+    );
+    expect(wrapper.find(PropList).prop("list")).toBe(a);
+    expect(wrapper.find(Icon).prop("icon")).toBe("caret-down");
+    wrapper.find(".prop-value").invoke("onDoubleClick")({} as any);
+    expect(wrapper.find(TextArea).length).toBe(0);
+  });
+
   it("should work when editable", () => {
     const wrapper = shallow(
       <PropItem propName="quality" propValue="good" editable />
