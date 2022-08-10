@@ -42,13 +42,15 @@ describe("SelectedBrickToolbar", () => {
     wrapper.find(Button).at(0).invoke("onClick")(null);
     expect(mockEval).toHaveBeenNthCalledWith(
       1,
-      "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(1));"
+      "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(1));",
+      {}
     );
 
     wrapper.find(Button).at(1).invoke("onClick")(null);
     expect(mockEval).toHaveBeenNthCalledWith(
       2,
-      "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(1).constructor);"
+      "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(1).constructor);",
+      {}
     );
 
     (useSelectedBrickContext as jest.Mock).mockReset();

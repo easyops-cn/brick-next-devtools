@@ -1,53 +1,84 @@
-// Pipe messages between content-script and devtools.
+import { MESSAGE_SOURCE_BACKGROUND } from "./shared/constants";
 
-const ports: Record<string, Record<string, chrome.runtime.Port>> = {};
+// Pipe messages between content-script and devtools.
+const devtoolsPorts = new Map<string, chrome.runtime.Port>();
+const contentScriptPorts = new Map<string, Set<chrome.runtime.Port>>();
 
 chrome.runtime.onConnect.addListener(function (port) {
-  let tab = null;
-  let name = null;
-  if (isNumeric(port.name)) {
-    tab = port.name;
-    name = "devtools";
+  const isDevtools = isNumeric(port.name);
+  if (isDevtools) {
+    const tab = String(port.name);
+
+    // When devtools port is connected, send set-frame messages
+    // to already connected content script ports.
+    const contentScripts = contentScriptPorts.get(tab) ?? new Set();
+    for (const contentScript of contentScripts) {
+      const { frameId, url } = contentScript.sender;
+      port.postMessage({
+        source: MESSAGE_SOURCE_BACKGROUND,
+        payload: {
+          type: "set-frame",
+          frameId,
+          frameURL: url,
+        },
+      });
+    }
+
+    devtoolsPorts.set(tab, port);
+    port.onMessage.addListener((message) => {
+      const contentScripts = contentScriptPorts.get(tab) ?? new Set();
+      for (const contentScript of contentScripts) {
+        contentScript.postMessage(message);
+      }
+    });
+    port.onDisconnect.addListener(() => {
+      devtoolsPorts.delete(tab);
+    });
   } else {
-    tab = port.sender.tab.id;
-    name = "content-script";
-  }
+    // Note: now we accept multiple content-script ports in each tab.
+    // (Along with `all_frames = true` in manifest.json).
+    const tab = String(port.sender.tab.id);
+    const { frameId, url } = port.sender;
 
-  if (!ports[tab]) {
-    ports[tab] = {};
-  }
-  ports[tab][name] = port;
+    // When devtools port is connected, send set-frame messages
+    // if devtools port has been connected already.
+    const devtoolsPort = devtoolsPorts.get(tab);
+    if (devtoolsPort) {
+      devtoolsPort.postMessage({
+        source: MESSAGE_SOURCE_BACKGROUND,
+        payload: {
+          type: "set-frame",
+          frameId,
+          frameURL: url,
+        },
+      });
+    }
 
-  pipeMessages(tab);
+    let connectedPorts = contentScriptPorts.get(tab);
+    if (!connectedPorts) {
+      connectedPorts = new Set();
+      contentScriptPorts.set(tab, connectedPorts);
+    }
+    connectedPorts.add(port);
+
+    port.onMessage.addListener((message) => {
+      const devtoolsPort = devtoolsPorts.get(tab);
+      if (devtoolsPort) {
+        // We pass the frameId to devtools, to let it distinguish
+        // frames where the message is from.
+        devtoolsPort.postMessage({
+          ...message,
+          frameId,
+        });
+      }
+    });
+
+    port.onDisconnect.addListener(() => {
+      connectedPorts.delete(port);
+    });
+  }
 });
 
 function isNumeric(str: string): boolean {
   return +str + "" === str;
-}
-
-function pipeMessages(tab: string | number): void {
-  const { devtools, "content-script": contentScript } = ports[tab];
-  if (!devtools || !contentScript) {
-    return;
-  }
-  devtools.onMessage.addListener(listenDevtools);
-  contentScript.onMessage.addListener(listenContentScript);
-  devtools.onDisconnect.addListener(shutdown);
-  contentScript.onDisconnect.addListener(shutdown);
-
-  function listenDevtools(message: any): void {
-    contentScript.postMessage(message);
-  }
-
-  function listenContentScript(message: any): void {
-    devtools.postMessage(message);
-  }
-
-  function shutdown(): void {
-    devtools.onMessage.removeListener(listenDevtools);
-    contentScript.onMessage.removeListener(listenContentScript);
-    devtools.disconnect();
-    contentScript.disconnect();
-    ports[tab] = {};
-  }
 }

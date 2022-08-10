@@ -4,9 +4,13 @@ import { useSupports } from "./useSupports";
 
 const mockEval = jest
   .fn()
-  .mockImplementation((str: string, callback: (result: boolean) => void) => {
-    callback(str.includes('"good"'));
-  });
+  .mockImplementation(
+    (str: string, options: any, callback: (result: boolean) => void) => {
+      (typeof options === "function" ? options : callback)(
+        str.includes('"good"')
+      );
+    }
+  );
 
 (window as any).chrome = {
   devtools: {

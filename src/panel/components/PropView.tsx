@@ -5,6 +5,7 @@ import { HOOK_NAME } from "../../shared/constants";
 import { BrickInfo, DehydratedBrickInfo } from "../../shared/interfaces";
 import { hydrate } from "../libs/hydrate";
 import { PropList } from "./PropList";
+import { useEvalOptions } from "../libs/useEvalOptions";
 
 const copyToClipboard = (text: string): void => {
   // istanbul ignore next
@@ -35,10 +36,12 @@ const tagsToDisplay: [keyof BrickInfo, string][] = [
 export function PropView(): React.ReactElement {
   const { selectedBrick } = useSelectedBrickContext();
   const [brickInfo, setBrickInfo] = React.useState<BrickInfo>({});
+  const evalOptions = useEvalOptions();
 
   const handleBrickInfoChange = React.useCallback(() => {
     chrome.devtools.inspectedWindow.eval(
       `window.${HOOK_NAME}.getBrickInfo(${selectedBrick.uid})`,
+      evalOptions,
       function (result: DehydratedBrickInfo, error) {
         // istanbul ignore if
         if (error) {
@@ -52,7 +55,7 @@ export function PropView(): React.ReactElement {
             if (existedHandler === undefined) {
               eventsMap.set(eventType, eventHandler);
             } else if (Array.isArray(existedHandler)) {
-              existedHandler.push(existedHandler);
+              existedHandler.push(eventHandler);
             } else {
               eventsMap.set(eventType, [existedHandler, eventHandler]);
             }
@@ -62,7 +65,7 @@ export function PropView(): React.ReactElement {
         setBrickInfo(newBrickInfo);
       }
     );
-  }, [selectedBrick]);
+  }, [evalOptions, selectedBrick]);
 
   React.useEffect(() => {
     if (selectedBrick) {
@@ -75,11 +78,11 @@ export function PropView(): React.ReactElement {
       // istanbul ignore else
       if (selectedBrick) {
         const evalParams = `window.${HOOK_NAME}.overrideProps(${selectedBrick.uid},"${propName}",${propValue})`;
-        chrome.devtools.inspectedWindow.eval(evalParams);
+        chrome.devtools.inspectedWindow.eval(evalParams, evalOptions);
         handleBrickInfoChange();
       }
     },
-    [selectedBrick, handleBrickInfoChange]
+    [evalOptions, selectedBrick, handleBrickInfoChange]
   );
 
   if (!selectedBrick || !brickInfo) {

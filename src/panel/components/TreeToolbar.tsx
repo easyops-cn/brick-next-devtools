@@ -7,6 +7,8 @@ import { BricksByMountPoint } from "../../shared/interfaces";
 import { useCollapsedBrickIdsContext } from "../libs/CollapsedBrickIdsContext";
 import { useShowFullNameContext } from "../libs/ShowFullNameContext";
 import { PanelSelector } from "./PanelSelector";
+import { InspectContextSelector } from "./InspectContextSelector";
+import { useEvalOptions } from "../libs/useEvalOptions";
 
 export function TreeToolbar(): React.ReactElement {
   const { setTree } = useBrickTreeContext();
@@ -16,10 +18,12 @@ export function TreeToolbar(): React.ReactElement {
     setExpandedInternalIds,
   } = useCollapsedBrickIdsContext();
   const { setSelectedBrick } = useSelectedBrickContext();
+  const evalOptions = useEvalOptions();
 
   const handleRefresh = React.useCallback((): void => {
     chrome.devtools.inspectedWindow.eval(
       `window.${HOOK_NAME} && window.${HOOK_NAME}.getBricks()`,
+      evalOptions,
       function (result: BricksByMountPoint, error) {
         // istanbul ignore if
         if (error) {
@@ -32,11 +36,17 @@ export function TreeToolbar(): React.ReactElement {
         setSelectedBrick(null);
       }
     );
-  }, [setTree, setCollapsedBrickIds, setExpandedInternalIds, setSelectedBrick]);
+  }, [
+    evalOptions,
+    setTree,
+    setCollapsedBrickIds,
+    setExpandedInternalIds,
+    setSelectedBrick,
+  ]);
 
   React.useEffect(() => {
     handleRefresh();
-  }, []);
+  }, [handleRefresh]);
 
   React.useEffect(() => {
     function onMessage(event: MessageEvent): void {
@@ -60,7 +70,10 @@ export function TreeToolbar(): React.ReactElement {
 
   return (
     <div className="tree-toolbar">
-      <PanelSelector />
+      <div className="toolbar-group">
+        <InspectContextSelector />
+        <PanelSelector />
+      </div>
       <ButtonGroup>
         <Tooltip content="Refresh bricks" hoverOpenDelay={300}>
           <Button icon="refresh" minimal onClick={handleRefresh} />

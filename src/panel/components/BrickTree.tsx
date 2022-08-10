@@ -6,6 +6,7 @@ import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
 import { RichBrickData, BrickData } from "../../shared/interfaces";
 import { useCollapsedBrickIdsContext } from "../libs/CollapsedBrickIdsContext";
 import { BrickLabel } from "./BrickLabel";
+import { useEvalOptions } from "../libs/useEvalOptions";
 
 export function BrickTree(): React.ReactElement {
   const { tree } = useBrickTreeContext();
@@ -16,6 +17,7 @@ export function BrickTree(): React.ReactElement {
     setExpandedInternalIds,
   } = useCollapsedBrickIdsContext();
   const { selectedBrick, setSelectedBrick } = useSelectedBrickContext();
+  const evalOptions = useEvalOptions();
 
   const handleNodeClick = React.useCallback(
     (node: ITreeNode<BrickData>) => {
@@ -28,9 +30,10 @@ export function BrickTree(): React.ReactElement {
 
   /* const handleNodeDoubleClick = React.useCallback((node: ITreeNode<BrickData>) => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.${HOOK_NAME}.getBrickByUid(${node.id}));`
+      `inspect(window.${HOOK_NAME}.getBrickByUid(${node.id}));`,
+      evalOptions
     );
-  }, []); */
+  }, [evalOptions]); */
 
   const handleNodeCollapse = React.useCallback(
     (node: ITreeNode<BrickData>) => {
@@ -58,20 +61,22 @@ export function BrickTree(): React.ReactElement {
     (node: ITreeNode<BrickData>) => {
       node.nodeData.includesInternalBricks ||
         chrome.devtools.inspectedWindow.eval(
-          `inspect(window.${HOOK_NAME}.inspectBrick(${node.id}));`
+          `inspect(window.${HOOK_NAME}.inspectBrick(${node.id}));`,
+          evalOptions
         );
     },
-    []
+    [evalOptions]
   );
 
   const handleNodeMouseLeave = React.useCallback(
     (node: ITreeNode<BrickData>) => {
       node.nodeData.includesInternalBricks ||
         chrome.devtools.inspectedWindow.eval(
-          `inspect(window.${HOOK_NAME}.dismissInspections(${node.id}));`
+          `inspect(window.${HOOK_NAME}.dismissInspections(${node.id}));`,
+          evalOptions
         );
     },
-    []
+    [evalOptions]
   );
 
   const bricksByMountPoint = React.useMemo<
