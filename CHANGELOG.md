@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.5](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.4...v0.6.5) (2022-08-10)
+
+### Features
+
+- support inspect inner frames ([df80914](https://github.com/easyops-cn/brick-next-devtools/commit/df80914dd770a6fd7f1fdec37a7de3589409f02e))
+
 ### [0.6.4](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.3...v0.6.4) (2022-08-05)
 
 ### Bug Fixes
