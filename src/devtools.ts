@@ -1,6 +1,7 @@
 import {
   EVALUATION_EDIT,
   HOOK_NAME,
+  MESSAGE_SOURCE_BACKGROUND,
   MESSAGE_SOURCE_DEVTOOLS,
   MESSAGE_SOURCE_HOOK,
   MESSAGE_SOURCE_PANEL,
@@ -20,7 +21,7 @@ function createPanelForBricks(): void {
   }
 
   chrome.devtools.inspectedWindow.eval(
-    `window.${HOOK_NAME} && window.${HOOK_NAME}.pageHasBricks`,
+    `!!(window.${HOOK_NAME} && window.${HOOK_NAME}.pageHasBricks)`,
     function (pageHasBricks) {
       if (!pageHasBricks || panelCreated) {
         return;
@@ -29,6 +30,7 @@ function createPanelForBricks(): void {
       panelCreated = true;
       clearInterval(loadCheckInterval);
       let panelWindow: Window;
+      const pendingMessages: unknown[] = [];
 
       const tabId = chrome.devtools.inspectedWindow.tabId;
 
@@ -36,15 +38,23 @@ function createPanelForBricks(): void {
         name: "" + tabId,
       });
 
+      function pushMessage(msg: unknown): void {
+        if (panelWindow) {
+          panelWindow?.postMessage(msg, "*");
+        } else {
+          pendingMessages.push(msg);
+        }
+      }
+
       function onPortMessage(message: any): void {
-        if (message?.source === MESSAGE_SOURCE_HOOK) {
-          panelWindow?.postMessage(
-            {
-              ...message,
-              forwardedBy: MESSAGE_SOURCE_DEVTOOLS,
-            },
-            "*"
-          );
+        if (
+          message?.source === MESSAGE_SOURCE_HOOK ||
+          message?.source === MESSAGE_SOURCE_BACKGROUND
+        ) {
+          pushMessage({
+            ...message,
+            forwardedBy: MESSAGE_SOURCE_DEVTOOLS,
+          });
         }
       }
 
@@ -70,6 +80,10 @@ function createPanelForBricks(): void {
           panel.onShown.addListener((win) => {
             panelWindow = win;
             panelWindow.addEventListener("message", onPanelMessage);
+            for (const msg of pendingMessages) {
+              panelWindow.postMessage(msg, "*");
+            }
+            pendingMessages.length = 0;
           });
         }
       );
@@ -77,15 +91,12 @@ function createPanelForBricks(): void {
       chrome.devtools.network.onNavigated.removeListener(createPanelForBricks);
 
       chrome.devtools.network.onNavigated.addListener(function onNavigated() {
-        panelWindow?.postMessage(
-          {
-            source: MESSAGE_SOURCE_DEVTOOLS,
-            payload: {
-              type: "navigated",
-            },
+        pushMessage({
+          source: MESSAGE_SOURCE_DEVTOOLS,
+          payload: {
+            type: "navigated",
           },
-          "*"
-        );
+        });
         port.onMessage.removeListener(onPortMessage);
         port.disconnect();
         port = chrome.runtime.connect({

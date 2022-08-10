@@ -17,6 +17,7 @@ import {
 } from "../../shared/constants";
 import { Evaluation } from "../../shared/interfaces";
 import { useSupports } from "../libs/useSupports";
+import { InspectContextSelector } from "./InspectContextSelector";
 
 export function EvaluationsPanel(): React.ReactElement {
   const {
@@ -95,6 +96,7 @@ export function EvaluationsPanel(): React.ReactElement {
     >
       <div className="evaluations-toolbar">
         <div className="toolbar-group">
+          <InspectContextSelector />
           <PanelSelector />
           <ButtonGroup>
             <Tooltip content="Clear" hoverOpenDelay={300}>

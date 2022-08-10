@@ -218,7 +218,8 @@ describe("BrickTree", () => {
     });
     expect(mockEval).toHaveBeenNthCalledWith(
       1,
-      "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.inspectBrick(1));"
+      "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.inspectBrick(1));",
+      {}
     );
 
     (wrapper.find(Tree).invoke("onNodeMouseLeave") as any)({
@@ -227,7 +228,8 @@ describe("BrickTree", () => {
     });
     expect(mockEval).toHaveBeenNthCalledWith(
       2,
-      "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.dismissInspections(1));"
+      "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.dismissInspections(1));",
+      {}
     );
 
     (useBrickTreeContext as jest.Mock).mockReset();

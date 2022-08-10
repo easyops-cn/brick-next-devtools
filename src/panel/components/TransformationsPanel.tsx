@@ -11,6 +11,7 @@ import {
 } from "../../shared/constants";
 import { Transformation } from "../../shared/interfaces";
 import { useSupports } from "../libs/useSupports";
+import { InspectContextSelector } from "./InspectContextSelector";
 
 export function TransformationsPanel(): React.ReactElement {
   const {
@@ -67,6 +68,7 @@ export function TransformationsPanel(): React.ReactElement {
     >
       <div className="transformations-toolbar">
         <div className="toolbar-group">
+          <InspectContextSelector />
           <PanelSelector />
           <ButtonGroup>
             <Tooltip content="Clear" hoverOpenDelay={300}>

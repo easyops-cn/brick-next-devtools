@@ -31,8 +31,8 @@ const setExpandedInternalIds = jest.fn();
   setShowFullName,
 });
 
-const mockEval = jest.fn((string: string, fn: Function): void => {
-  fn({
+const mockEval = jest.fn((string: string, options: any, fn: any): void => {
+  (typeof options === "function" ? options : fn)({
     main: [],
     bg: [],
   });

@@ -3,21 +3,25 @@ import classNames from "classnames";
 import { Button, ButtonGroup, Classes, Tooltip } from "@blueprintjs/core";
 import { HOOK_NAME } from "../../shared/constants";
 import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
+import { useEvalOptions } from "../libs/useEvalOptions";
 
 export function SelectedBrickToolbar(): React.ReactElement {
   const { selectedBrick } = useSelectedBrickContext();
+  const evalOptions = useEvalOptions();
 
   const handleInspectElement = React.useCallback((): void => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.${HOOK_NAME}.getBrickByUid(${selectedBrick.uid}));`
+      `inspect(window.${HOOK_NAME}.getBrickByUid(${selectedBrick.uid}));`,
+      evalOptions
     );
-  }, [selectedBrick]);
+  }, [evalOptions, selectedBrick]);
 
   const handleInspectCode = React.useCallback((): void => {
     chrome.devtools.inspectedWindow.eval(
-      `inspect(window.${HOOK_NAME}.getBrickByUid(${selectedBrick.uid}).constructor);`
+      `inspect(window.${HOOK_NAME}.getBrickByUid(${selectedBrick.uid}).constructor);`,
+      evalOptions
     );
-  }, [selectedBrick]);
+  }, [evalOptions, selectedBrick]);
 
   return (
     <div className="selected-brick-toolbar">

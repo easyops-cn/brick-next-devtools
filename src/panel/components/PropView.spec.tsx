@@ -11,8 +11,12 @@ jest.mock("../libs/SelectedBrickContext");
 (useSelectedBrickContext as jest.Mock).mockReturnValue({ selectedBrick: null });
 
 const mockEval = jest.fn(
-  (string: string, fn: (brickInfo: DehydratedBrickInfo) => void): void => {
-    fn({
+  (
+    string: string,
+    options: any,
+    fn: (brickInfo: DehydratedBrickInfo) => void
+  ): void => {
+    (typeof options === "function" ? options : fn)({
       info: {
         properties: {
           quality: "good",

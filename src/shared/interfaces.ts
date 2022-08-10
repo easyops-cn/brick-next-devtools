@@ -108,3 +108,10 @@ export interface DehydratedPayload {
   payload: any;
   repo: any[];
 }
+
+export type InspectContext = number;
+
+export interface FrameData {
+  frameId: number;
+  frameURL: string;
+}

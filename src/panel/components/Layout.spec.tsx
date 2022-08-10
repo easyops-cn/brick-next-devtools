@@ -6,7 +6,10 @@ import { Storage } from "../libs/Storage";
 import { BricksPanel } from "./BricksPanel";
 import { EvaluationsPanel } from "./EvaluationsPanel";
 import { TransformationsPanel } from "./TransformationsPanel";
-import { MESSAGE_SOURCE_HOOK } from "../../shared/constants";
+import {
+  MESSAGE_SOURCE_BACKGROUND,
+  MESSAGE_SOURCE_HOOK,
+} from "../../shared/constants";
 import { useEvaluationsContext } from "../libs/EvaluationsContext";
 import { useTransformationsContext } from "../libs/TransformationsContext";
 
@@ -48,10 +51,21 @@ const storageSetItem = jest
   .spyOn(Storage, "setItem")
   .mockImplementation(() => void 0);
 
+const mockEval = jest
+  .fn()
+  .mockImplementation(
+    (str: string, options: any, callback: (result: boolean) => void) => {
+      (typeof options === "function" ? options : callback)(true);
+    }
+  );
+
 const mockPanels: Record<string, any> = {};
 (window as any).chrome = {
   devtools: {
     panels: mockPanels,
+    inspectedWindow: {
+      eval: mockEval,
+    },
   },
 };
 
@@ -114,6 +128,7 @@ describe("Layout", () => {
             type: "evaluation",
             payload: "good",
           },
+          frameId: 0,
         },
         location.origin
       );
@@ -137,6 +152,7 @@ describe("Layout", () => {
               result: "good",
             },
           },
+          frameId: 0,
         },
         location.origin
       );
@@ -153,6 +169,7 @@ describe("Layout", () => {
               result: "new",
             },
           },
+          frameId: 0,
         },
         location.origin
       );
@@ -173,6 +190,7 @@ describe("Layout", () => {
             type: "transformation",
             payload: "good",
           },
+          frameId: 0,
         },
         location.origin
       );
@@ -196,6 +214,7 @@ describe("Layout", () => {
               id: 0,
             },
           },
+          frameId: 0,
         },
         location.origin
       );
@@ -212,6 +231,7 @@ describe("Layout", () => {
               result: "new",
             },
           },
+          frameId: 0,
         },
         location.origin
       );
@@ -235,6 +255,7 @@ describe("Layout", () => {
             type: "evaluation",
             payload: "good",
           },
+          frameId: 0,
         },
         location.origin
       );
@@ -250,12 +271,50 @@ describe("Layout", () => {
           payload: {
             type: "locationChange",
           },
+          frameId: 0,
         },
         location.origin
       );
       await new Promise((resolve) => setTimeout(resolve));
     });
     expect(wrapper.text()).toBe(`EvaluationsPanel (${length})`);
+    wrapper.unmount();
+  });
+
+  it("should work for new frame", async () => {
+    storageGetItem.mockReturnValue("Evaluations");
+    const wrapper = mount(<Layout />);
+
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_BACKGROUND,
+          payload: {
+            type: "set-frame",
+            frameId: 1,
+            frameURL: "/1",
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_HOOK,
+          payload: {
+            type: "evaluation",
+            payload: "good",
+          },
+          frameId: 1,
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(wrapper.text()).toBe("EvaluationsPanel (1)");
     wrapper.unmount();
   });
 });
