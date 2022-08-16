@@ -1,10 +1,12 @@
 import {
   EVALUATION_EDIT,
+  FRAME_ACTIVE_CHANGE,
   HOOK_NAME,
   MESSAGE_SOURCE_BACKGROUND,
   MESSAGE_SOURCE_DEVTOOLS,
   MESSAGE_SOURCE_HOOK,
   MESSAGE_SOURCE_PANEL,
+  PANEL_CHANGE,
   TRANSFORMATION_EDIT,
 } from "./shared/constants";
 
@@ -61,9 +63,12 @@ function createPanelForBricks(): void {
       function onPanelMessage(event: MessageEvent): void {
         if (
           event?.data.source === MESSAGE_SOURCE_PANEL &&
-          [EVALUATION_EDIT, TRANSFORMATION_EDIT].includes(
-            event.data.payload?.type
-          )
+          [
+            EVALUATION_EDIT,
+            TRANSFORMATION_EDIT,
+            FRAME_ACTIVE_CHANGE,
+            PANEL_CHANGE,
+          ].includes(event.data.payload?.type)
         ) {
           port?.postMessage(event.data);
         }

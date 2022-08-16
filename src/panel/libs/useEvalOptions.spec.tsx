@@ -12,7 +12,7 @@ describe("useEvalOptions", () => {
   it("should work for top frame", () => {
     const wrapper = mount(
       <SelectedInspectContext.Provider
-        value={{ frames: [], inspectContext: 0 }}
+        value={{ framesRef: { current: new Map() }, inspectFrameIndex: 0 }}
       >
         <TestComponent />
       </SelectedInspectContext.Provider>
@@ -24,17 +24,25 @@ describe("useEvalOptions", () => {
     const wrapper = mount(
       <SelectedInspectContext.Provider
         value={{
-          frames: [
-            {
-              frameId: 1,
-              frameURL: "/1",
-            },
-            {
-              frameId: 2,
-              frameURL: "/2",
-            },
-          ],
-          inspectContext: 2,
+          framesRef: {
+            current: new Map([
+              [
+                1,
+                {
+                  frameId: 1,
+                  frameURL: "/1",
+                },
+              ],
+              [
+                2,
+                {
+                  frameId: 2,
+                  frameURL: "/2",
+                },
+              ],
+            ]),
+          },
+          inspectFrameIndex: 2,
         }}
       >
         <TestComponent />

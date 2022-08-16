@@ -1,30 +1,31 @@
-function setItem(key: string, value: any): void {
-  sessionStorage.setItem(key, JSON.stringify(value));
-}
+class JsonStorage<U = Record<string, any>> {
+  constructor(private storage: Storage) {}
 
-function getItem(key: string): any {
-  const value = sessionStorage.getItem(key);
-  if (value === null) {
-    return null;
+  setItem<T extends string & keyof U>(name: T, value: U[T]): void {
+    this.storage.setItem(name, JSON.stringify(value));
   }
-  try {
-    return JSON.parse(value);
-  } catch (e) {
-    return null;
+
+  getItem<T extends string & keyof U>(name: T): U[T] {
+    const value = this.storage.getItem(name);
+    if (value === null) {
+      return null;
+    }
+    try {
+      return JSON.parse(value) as U[T];
+    } catch (e) {
+      return null;
+    }
+  }
+
+  removeItem<T extends string & keyof U>(name: T): void {
+    return this.storage.removeItem(name);
+  }
+
+  clear(): void {
+    return this.storage.clear();
   }
 }
 
-function removeItem(key: string): void {
-  sessionStorage.removeItem(key);
-}
+export const Storage = new JsonStorage(sessionStorage);
 
-function clear(): void {
-  sessionStorage.clear();
-}
-
-export const Storage = {
-  setItem,
-  getItem,
-  removeItem,
-  clear,
-};
+export const LocalJsonStorage = new JsonStorage(localStorage);

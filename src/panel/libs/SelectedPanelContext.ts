@@ -1,8 +1,9 @@
 import React from "react";
+import { PanelType } from "../../shared/interfaces";
 
 export interface ContextOfSelectedPanel {
-  selectedPanel?: string;
-  setSelectedPanel?: React.Dispatch<React.SetStateAction<string>>;
+  selectedPanel?: PanelType;
+  setSelectedPanel?: React.Dispatch<React.SetStateAction<PanelType>>;
 }
 
 export const SelectedPanelContext = React.createContext<ContextOfSelectedPanel>(

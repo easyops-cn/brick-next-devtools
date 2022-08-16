@@ -15,9 +15,12 @@ import {
   MESSAGE_SOURCE_PANEL,
   EDIT_EVALUATIONS_AND_TRANSFORMATIONS_IN_DEVTOOLS,
 } from "../../shared/constants";
-import { Evaluation } from "../../shared/interfaces";
+import { LazyEvaluation } from "../../shared/interfaces";
 import { useSupports } from "../libs/useSupports";
 import { InspectContextSelector } from "./InspectContextSelector";
+import { hydrate } from "../libs/hydrate";
+import { Pagination } from "./Pagination";
+import { LocalJsonStorage } from "../libs/Storage";
 
 export function EvaluationsPanel(): React.ReactElement {
   const {
@@ -31,6 +34,10 @@ export function EvaluationsPanel(): React.ReactElement {
   const editable = useSupports(
     EDIT_EVALUATIONS_AND_TRANSFORMATIONS_IN_DEVTOOLS
   );
+  const [page, setPage] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(
+    () => LocalJsonStorage.getItem("evaluationsPageSize") ?? 20
+  );
 
   const handleClear = React.useCallback(() => {
     setEvaluations([]);
@@ -39,6 +46,7 @@ export function EvaluationsPanel(): React.ReactElement {
   const handleFilterChange = React.useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       setQ(event.target.value);
+      setPage(1);
     },
     []
   );
@@ -47,9 +55,8 @@ export function EvaluationsPanel(): React.ReactElement {
     if (!q) {
       return evaluations;
     }
-    return evaluations.filter((item) =>
-      item.detail?.raw.toLocaleLowerCase().includes(q.toLocaleLowerCase())
-    );
+    const lowerQ = q.toLowerCase();
+    return evaluations.filter((item) => item.lowerRaw.includes(lowerQ));
   }, [evaluations, q]);
 
   const handleToggleStringWrap = React.useCallback(
@@ -66,7 +73,7 @@ export function EvaluationsPanel(): React.ReactElement {
     [savePreserveLogs]
   );
 
-  const handleEvaluations = (item: Evaluation, value: string): void => {
+  const handleEvaluations = (item: LazyEvaluation, value: string): void => {
     const {
       context: { DATA, EVENT },
     } = item.detail;
@@ -87,6 +94,34 @@ export function EvaluationsPanel(): React.ReactElement {
       "*"
     );
   };
+
+  const pagedEvaluations = React.useMemo(() => {
+    const list = filteredEvaluations.slice(
+      (page - 1) * pageSize,
+      page * pageSize
+    );
+    for (const item of list) {
+      if (!item.hydrated) {
+        item.detail = hydrate(item.payload, item.repo);
+        item.hydrated = true;
+        item.payload = null;
+        item.repo = null;
+      }
+    }
+    return list;
+  }, [filteredEvaluations, page, pageSize]);
+
+  const handleGotoPage = React.useCallback((targetPage: number) => {
+    setPage(targetPage);
+  }, []);
+
+  const totalPages = Math.ceil(filteredEvaluations.length / pageSize);
+
+  const handlePageSizeChange = React.useCallback((newPageSize: number) => {
+    setPageSize(newPageSize);
+    setPage(1);
+    LocalJsonStorage.setItem("evaluationsPageSize", newPageSize);
+  }, []);
 
   return (
     <div
@@ -125,6 +160,13 @@ export function EvaluationsPanel(): React.ReactElement {
       </div>
       <div className="table-view">
         <div className="scroll-container">
+          <Pagination
+            page={page}
+            pageSize={pageSize}
+            totalPages={totalPages}
+            onGotoPage={handleGotoPage}
+            onPageSizeChange={handlePageSizeChange}
+          />
           <table className="bp3-html-table bp3-html-table-bordered bp3-html-table-condensed">
             <thead>
               <tr>
@@ -134,14 +176,14 @@ export function EvaluationsPanel(): React.ReactElement {
               </tr>
             </thead>
             <tbody className="source-code">
-              {filteredEvaluations.map((item, key) => (
-                <tr key={key}>
+              {pagedEvaluations.map((item) => (
+                <tr key={item.id}>
                   <td>
                     <PropItem
-                      propValue={item.detail?.raw}
+                      propValue={item.detail.raw}
                       standalone
                       editable={editable}
-                      editAsString={typeof item.detail?.raw === "string"}
+                      editAsString
                       overrideProps={(_name, _prop, value) =>
                         handleEvaluations(item, value)
                       }
@@ -153,11 +195,11 @@ export function EvaluationsPanel(): React.ReactElement {
                         Error: {item.error}
                       </code>
                     ) : (
-                      <PropItem propValue={item.detail?.result} standalone />
+                      <PropItem propValue={item.detail.result} standalone />
                     )}
                   </td>
                   <td>
-                    <PropList list={item.detail?.context || {}} />
+                    <PropList list={item.detail.context || {}} />
                   </td>
                 </tr>
               ))}

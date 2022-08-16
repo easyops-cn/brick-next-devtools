@@ -239,12 +239,34 @@ body {
   font-size: inherit;
 }
 
-.inspect-context-selector .bp3-html-select select,
-.inspect-context-selector .bp3-select select {
+.inspect-inner-frame .bp3-html-select select,
+.inspect-inner-frame .bp3-select select {
   color: #c87619;
 }
 
-.bp3-dark .inspect-context-selector .bp3-html-select select,
-.bp3-dark .inspect-context-selector .bp3-select select {
+.bp3-dark .inspect-inner-frame .bp3-html-select select,
+.bp3-dark .inspect-inner-frame .bp3-select select {
   color: #ec9a3c;
+}
+
+.inspect-frame-unavailable .bp3-html-select select,
+.inspect-frame-unavailable .bp3-select select {
+  color: #abb3bf;
+}
+
+.bp3-dark .inspect-frame-unavailable .bp3-html-select select,
+.bp3-dark .inspect-frame-unavailable .bp3-select select {
+  color: #5f6b7c;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  position: sticky;
+  top: 0;
+  height: 50px;
+  background-color: var(--root-bg-color);
+  border-bottom: 1px solid var(--pane-border-color);
 }
