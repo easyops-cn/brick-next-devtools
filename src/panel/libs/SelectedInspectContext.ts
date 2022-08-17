@@ -1,17 +1,16 @@
 import React from "react";
-import { FrameData, InspectContext } from "../../shared/interfaces";
+import { FrameData } from "../../shared/interfaces";
 
 export interface ContextOfSelectedInspectContext {
-  frames?: FrameData[];
-  inspectContext?: InspectContext;
-  setInspectContext?: React.Dispatch<React.SetStateAction<InspectContext>>;
+  framesRef?: React.RefObject<Map<number, FrameData>>;
+  inspectFrameIndex?: number;
+  setInspectFrameIndex?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const SelectedInspectContext = React.createContext<
   ContextOfSelectedInspectContext
 >({
-  frames: [],
-  inspectContext: 0,
+  inspectFrameIndex: 0,
 });
 
 // istanbul ignore next

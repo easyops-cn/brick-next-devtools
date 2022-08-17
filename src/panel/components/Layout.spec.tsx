@@ -126,10 +126,13 @@ describe("Layout", () => {
           source: MESSAGE_SOURCE_HOOK,
           payload: {
             type: "evaluation",
-            payload: "good",
+            payload: {
+              raw: "good",
+            },
           },
           frameId: 0,
         },
+
         location.origin
       );
       await new Promise((resolve) => setTimeout(resolve));
@@ -149,6 +152,7 @@ describe("Layout", () => {
             type: "evaluation",
             payload: {
               id: 0,
+              raw: "good",
               result: "good",
             },
           },
@@ -166,6 +170,7 @@ describe("Layout", () => {
             type: "re-evaluation",
             payload: {
               id: 0,
+              raw: "new",
               result: "new",
             },
           },
@@ -253,7 +258,7 @@ describe("Layout", () => {
           source: MESSAGE_SOURCE_HOOK,
           payload: {
             type: "evaluation",
-            payload: "good",
+            payload: { raw: "good" },
           },
           frameId: 0,
         },
@@ -290,7 +295,7 @@ describe("Layout", () => {
         {
           source: MESSAGE_SOURCE_BACKGROUND,
           payload: {
-            type: "set-frame",
+            type: "frame-connected",
             frameId: 1,
             frameURL: "/1",
           },
@@ -306,7 +311,7 @@ describe("Layout", () => {
           source: MESSAGE_SOURCE_HOOK,
           payload: {
             type: "evaluation",
-            payload: "good",
+            payload: { raw: "good" },
           },
           frameId: 1,
         },
@@ -315,6 +320,22 @@ describe("Layout", () => {
       await new Promise((resolve) => setTimeout(resolve));
     });
     expect(wrapper.text()).toBe("EvaluationsPanel (1)");
+
+    await act(async () => {
+      window.postMessage(
+        {
+          source: MESSAGE_SOURCE_BACKGROUND,
+          payload: {
+            type: "frame-disconnected",
+            frameId: 1,
+          },
+        },
+        location.origin
+      );
+      await new Promise((resolve) => setTimeout(resolve));
+    });
+    expect(wrapper.text()).toBe("EvaluationsPanel (0)");
+
     wrapper.unmount();
   });
 });

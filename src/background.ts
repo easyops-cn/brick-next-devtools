@@ -9,7 +9,7 @@ chrome.runtime.onConnect.addListener(function (port) {
   if (isDevtools) {
     const tab = String(port.name);
 
-    // When devtools port is connected, send set-frame messages
+    // When devtools port is connected, send frame-connected messages
     // to already connected content script ports.
     const contentScripts = contentScriptPorts.get(tab) ?? new Set();
     for (const contentScript of contentScripts) {
@@ -17,7 +17,7 @@ chrome.runtime.onConnect.addListener(function (port) {
       port.postMessage({
         source: MESSAGE_SOURCE_BACKGROUND,
         payload: {
-          type: "set-frame",
+          type: "frame-connected",
           frameId,
           frameURL: url,
         },
@@ -28,7 +28,12 @@ chrome.runtime.onConnect.addListener(function (port) {
     port.onMessage.addListener((message) => {
       const contentScripts = contentScriptPorts.get(tab) ?? new Set();
       for (const contentScript of contentScripts) {
-        contentScript.postMessage(message);
+        if (
+          message.frameId === undefined ||
+          message.frameId === contentScript.sender.frameId
+        ) {
+          contentScript.postMessage(message);
+        }
       }
     });
     port.onDisconnect.addListener(() => {
@@ -40,14 +45,14 @@ chrome.runtime.onConnect.addListener(function (port) {
     const tab = String(port.sender.tab.id);
     const { frameId, url } = port.sender;
 
-    // When devtools port is connected, send set-frame messages
+    // When content script port is connected, send frame-connected messages
     // if devtools port has been connected already.
     const devtoolsPort = devtoolsPorts.get(tab);
     if (devtoolsPort) {
       devtoolsPort.postMessage({
         source: MESSAGE_SOURCE_BACKGROUND,
         payload: {
-          type: "set-frame",
+          type: "frame-connected",
           frameId,
           frameURL: url,
         },
@@ -74,7 +79,18 @@ chrome.runtime.onConnect.addListener(function (port) {
     });
 
     port.onDisconnect.addListener(() => {
+      console.log("content disconnected", frameId);
       connectedPorts.delete(port);
+      const devtoolsPort = devtoolsPorts.get(tab);
+      if (devtoolsPort) {
+        devtoolsPort.postMessage({
+          source: MESSAGE_SOURCE_BACKGROUND,
+          payload: {
+            type: "frame-disconnected",
+            frameId,
+          },
+        });
+      }
     });
   }
 });

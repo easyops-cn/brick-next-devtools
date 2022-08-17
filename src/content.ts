@@ -3,6 +3,8 @@ import {
   EVALUATION_EDIT,
   TRANSFORMATION_EDIT,
   MESSAGE_SOURCE_PANEL,
+  FRAME_ACTIVE_CHANGE,
+  PANEL_CHANGE,
 } from "./shared/constants";
 
 function injectScript(file: string): void {
@@ -25,7 +27,12 @@ function initPort(): void {
   port.onMessage.addListener((message) => {
     if (
       message.source === MESSAGE_SOURCE_PANEL &&
-      [EVALUATION_EDIT, TRANSFORMATION_EDIT].includes(message.payload?.type)
+      [
+        EVALUATION_EDIT,
+        TRANSFORMATION_EDIT,
+        FRAME_ACTIVE_CHANGE,
+        PANEL_CHANGE,
+      ].includes(message.payload?.type)
     ) {
       window.postMessage(message, "*");
     }

@@ -1,6 +1,7 @@
 import React from "react";
 import { HTMLSelect } from "@blueprintjs/core";
 import { useSelectedPanelContext } from "../libs/SelectedPanelContext";
+import { PanelType } from "../../shared/interfaces";
 
 export function PanelSelector({
   style,
@@ -10,7 +11,7 @@ export function PanelSelector({
   const { selectedPanel, setSelectedPanel } = useSelectedPanelContext();
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>): void => {
-    setSelectedPanel(event.target.value);
+    setSelectedPanel(event.target.value as PanelType);
   };
 
   return (

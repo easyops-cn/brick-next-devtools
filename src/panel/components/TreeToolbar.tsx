@@ -9,6 +9,7 @@ import { useShowFullNameContext } from "../libs/ShowFullNameContext";
 import { PanelSelector } from "./PanelSelector";
 import { InspectContextSelector } from "./InspectContextSelector";
 import { useEvalOptions } from "../libs/useEvalOptions";
+import { useSelectedFrameIsAvailable } from "../libs/useSelectedFrameIsAvailable";
 
 export function TreeToolbar(): React.ReactElement {
   const { setTree } = useBrickTreeContext();
@@ -19,8 +20,19 @@ export function TreeToolbar(): React.ReactElement {
   } = useCollapsedBrickIdsContext();
   const { setSelectedBrick } = useSelectedBrickContext();
   const evalOptions = useEvalOptions();
+  const frameIsAvailable = useSelectedFrameIsAvailable();
 
   const handleRefresh = React.useCallback((): void => {
+    const refresh = (result: BricksByMountPoint): void => {
+      setTree(result);
+      setCollapsedBrickIds([]);
+      setExpandedInternalIds([]);
+      setSelectedBrick(null);
+    };
+    if (!frameIsAvailable) {
+      refresh(null);
+      return;
+    }
     chrome.devtools.inspectedWindow.eval(
       `window.${HOOK_NAME} && window.${HOOK_NAME}.getBricks()`,
       evalOptions,
@@ -29,14 +41,11 @@ export function TreeToolbar(): React.ReactElement {
         if (error) {
           console.error("getBricks()", error);
         }
-
-        setTree(result);
-        setCollapsedBrickIds([]);
-        setExpandedInternalIds([]);
-        setSelectedBrick(null);
+        refresh(result);
       }
     );
   }, [
+    frameIsAvailable,
     evalOptions,
     setTree,
     setCollapsedBrickIds,

@@ -63,6 +63,16 @@ export interface Evaluation {
   error?: string;
 }
 
+export interface LazyEvaluation {
+  id: number;
+  hydrated: boolean;
+  lowerRaw: string;
+  payload?: unknown;
+  repo?: unknown[];
+  detail?: EvaluationDetail;
+  error?: string;
+}
+
 export interface Transformation {
   id: number;
   detail: TransformationDetail;
@@ -109,9 +119,9 @@ export interface DehydratedPayload {
   repo: any[];
 }
 
-export type InspectContext = number;
-
 export interface FrameData {
   frameId: number;
   frameURL: string;
 }
+
+export type PanelType = "Bricks" | "Evaluations" | "Transformations";

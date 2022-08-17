@@ -12,7 +12,7 @@ const savePreserveLogs = jest.fn();
   evaluations: [
     {
       id: 1,
-      detail: {
+      payload: {
         raw: "<% EVENT.detail %>",
         result: "good",
         context: {
@@ -24,9 +24,12 @@ const savePreserveLogs = jest.fn();
           },
         },
       },
+      repo: [],
+      lowerRaw: "<% event.detail %>",
     },
     {
-      detail: {
+      id: 3,
+      payload: {
         raw: "<% DATA.quality %>",
         result: "better",
         context: {
@@ -35,13 +38,17 @@ const savePreserveLogs = jest.fn();
           },
         },
       },
+      repo: [],
+      lowerRaw: "<% data.quality %>",
     },
     {
       id: 2,
-      detail: {
+      payload: {
         raw: "<% DATA.quality %>",
         context: {},
       },
+      repo: [],
+      lowerRaw: "<% data.quality %>",
       error: "DATA is undefined",
     },
   ],

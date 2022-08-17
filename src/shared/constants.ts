@@ -8,3 +8,5 @@ export const EVALUATION_EDIT = "devtools-evaluation-edit";
 export const TRANSFORMATION_EDIT = "devtools-transformation-edit";
 export const EDIT_EVALUATIONS_AND_TRANSFORMATIONS_IN_DEVTOOLS =
   "edit-evaluations-and-transformations-in-devtools";
+export const FRAME_ACTIVE_CHANGE = "devtools-frame-active-change";
+export const PANEL_CHANGE = "devtools-panel-change";

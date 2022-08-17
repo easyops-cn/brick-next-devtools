@@ -1,9 +1,9 @@
 import React from "react";
-import { Evaluation } from "../../shared/interfaces";
+import { LazyEvaluation } from "../../shared/interfaces";
 
 export interface ContextOfEvaluations {
-  evaluations?: Evaluation[];
-  setEvaluations?: React.Dispatch<React.SetStateAction<Evaluation[]>>;
+  evaluations?: LazyEvaluation[];
+  setEvaluations?: React.Dispatch<React.SetStateAction<LazyEvaluation[]>>;
   preserveLogs?: boolean;
   savePreserveLogs?: React.Dispatch<React.SetStateAction<boolean>>;
 }
