@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.6](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.5...v0.6.6) (2022-08-17)
+
+### Features
+
+- support pagination in evaluations panel ([acd03ad](https://github.com/easyops-cn/brick-next-devtools/commit/acd03ade05c2c6398c3681299e928e1ea71eae21))
+
 ### [0.6.5](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.4...v0.6.5) (2022-08-10)
 
 ### Features
