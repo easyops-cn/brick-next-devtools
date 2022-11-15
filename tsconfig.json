@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "experimentalDecorators": true,
     "sourceMap": true,
     "importHelpers": true,
     "moduleResolution": "node",

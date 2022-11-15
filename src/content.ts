@@ -1,3 +1,4 @@
+import { decodeMessage } from "./proto/message";
 import {
   MESSAGE_SOURCE_HOOK,
   EVALUATION_EDIT,
@@ -44,6 +45,10 @@ if (document.contentType === "text/html") {
 
   window.addEventListener("message", (event: MessageEvent) => {
     if (event.source === window) {
+      if (event.data && event.data instanceof Uint8Array) {
+        const result = decodeMessage(event.data);
+        console.log(result);
+      }
       if (event.data?.source === MESSAGE_SOURCE_HOOK) {
         if (!port) {
           initPort();

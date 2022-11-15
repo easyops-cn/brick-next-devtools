@@ -8,7 +8,9 @@ module.exports = {
   devtool:
     // DevTools page doesn't support separated source-map yet.
     // Use inline-source-map in development only.
-    process.env.NODE_ENV === "development" ? "inline-source-map" : undefined,
+    process.env.NODE_ENV === "development"
+      ? "cheap-module-source-map"
+      : undefined,
   context: __dirname,
   entry: {
     devtools: "./src/devtools",
@@ -38,6 +40,13 @@ module.exports = {
           plugins: [
             "@babel/plugin-proposal-optional-chaining",
             "@babel/plugin-proposal-nullish-coalescing-operator",
+            [
+              "@babel/plugin-proposal-decorators",
+              {
+                legacy: true,
+              },
+            ],
+            ["@babel/plugin-proposal-class-properties", { loose: true }],
           ],
         },
       },
