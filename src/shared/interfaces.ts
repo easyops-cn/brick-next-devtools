@@ -125,3 +125,9 @@ export interface FrameData {
 }
 
 export type PanelType = "Bricks" | "Evaluations" | "Transformations";
+
+export interface MessageBody {
+  source: string;
+  payload: any;
+  frameId?: number;
+}

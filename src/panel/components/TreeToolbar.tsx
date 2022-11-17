@@ -10,6 +10,7 @@ import { PanelSelector } from "./PanelSelector";
 import { InspectContextSelector } from "./InspectContextSelector";
 import { useEvalOptions } from "../libs/useEvalOptions";
 import { useSelectedFrameIsAvailable } from "../libs/useSelectedFrameIsAvailable";
+import { onMessage } from "../../hook/postMessage";
 
 export function TreeToolbar(): React.ReactElement {
   const { setTree } = useBrickTreeContext();
@@ -58,16 +59,16 @@ export function TreeToolbar(): React.ReactElement {
   }, [handleRefresh]);
 
   React.useEffect(() => {
-    function onMessage(event: MessageEvent): void {
+    function listener(eventData: any): void {
       if (
-        event.data?.source === MESSAGE_SOURCE_HOOK &&
-        event.data.payload?.type === "rendered"
+        eventData.source === MESSAGE_SOURCE_HOOK &&
+        eventData.payload?.type === "rendered"
       ) {
         handleRefresh();
       }
     }
-    window.addEventListener("message", onMessage);
-    return (): void => window.removeEventListener("message", onMessage);
+    onMessage(listener);
+    return (): void => window.removeEventListener("message", listener);
   }, [handleRefresh]);
 
   const handleToggleFullName = React.useCallback(

@@ -12,6 +12,7 @@ import {
 import { Transformation } from "../../shared/interfaces";
 import { useSupports } from "../libs/useSupports";
 import { InspectContextSelector } from "./InspectContextSelector";
+import { postMessage } from "../../hook/postMessage";
 
 export function TransformationsPanel(): React.ReactElement {
   const {
@@ -45,7 +46,7 @@ export function TransformationsPanel(): React.ReactElement {
 
   const handleTransform = (item: Transformation, value: any): void => {
     const { options, data } = item.detail;
-    window.postMessage(
+    postMessage(
       {
         source: MESSAGE_SOURCE_PANEL,
         payload: {
@@ -56,7 +57,6 @@ export function TransformationsPanel(): React.ReactElement {
           transform: value,
         },
       },
-      "*"
     );
   };
 

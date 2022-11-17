@@ -1,4 +1,4 @@
-import { decodeMessage } from "./proto/message";
+import { onMessage, postMessage } from "./hook/postMessage";
 import {
   MESSAGE_SOURCE_HOOK,
   EVALUATION_EDIT,
@@ -35,7 +35,7 @@ function initPort(): void {
         PANEL_CHANGE,
       ].includes(message.payload?.type)
     ) {
-      window.postMessage(message, "*");
+      postMessage(message);
     }
   });
 }
@@ -43,18 +43,12 @@ function initPort(): void {
 if (document.contentType === "text/html") {
   injectScript("build/hook.js");
 
-  window.addEventListener("message", (event: MessageEvent) => {
-    if (event.source === window) {
-      if (event.data && event.data instanceof Uint8Array) {
-        const result = decodeMessage(event.data);
-        console.log(result);
+  onMessage((data) => {
+    if (data?.source === MESSAGE_SOURCE_HOOK) {
+      if (!port) {
+        initPort();
       }
-      if (event.data?.source === MESSAGE_SOURCE_HOOK) {
-        if (!port) {
-          initPort();
-        }
-        port?.postMessage(event.data);
-      }
+      port?.postMessage(data);
     }
-  });
+  })
 }

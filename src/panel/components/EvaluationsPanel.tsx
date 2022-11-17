@@ -21,6 +21,7 @@ import { InspectContextSelector } from "./InspectContextSelector";
 import { hydrate } from "../libs/hydrate";
 import { Pagination } from "./Pagination";
 import { LocalJsonStorage } from "../libs/Storage";
+import { postMessage } from "../../hook/postMessage";
 
 export function EvaluationsPanel(): React.ReactElement {
   const {
@@ -36,7 +37,7 @@ export function EvaluationsPanel(): React.ReactElement {
   );
   const [page, setPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(
-    () => LocalJsonStorage.getItem("evaluationsPageSize") ?? 20
+    () => LocalJsonStorage.getItem("evaluationsPageSize") ?? 100
   );
 
   const handleClear = React.useCallback(() => {
@@ -78,21 +79,18 @@ export function EvaluationsPanel(): React.ReactElement {
       context: { DATA, EVENT },
     } = item.detail;
 
-    window.postMessage(
-      {
-        source: MESSAGE_SOURCE_PANEL,
-        payload: {
-          type: EVALUATION_EDIT,
-          context: {
-            data: DATA,
-            event: EVENT,
-          },
-          id: item.id,
-          raw: value,
+    postMessage({
+      source: MESSAGE_SOURCE_PANEL,
+      payload: {
+        type: EVALUATION_EDIT,
+        context: {
+          data: DATA,
+          event: EVENT,
         },
+        id: item.id,
+        raw: value,
       },
-      "*"
-    );
+    })
   };
 
   const pagedEvaluations = React.useMemo(() => {

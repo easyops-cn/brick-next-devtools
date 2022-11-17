@@ -25,6 +25,7 @@ import { TransformationsContext } from "../libs/TransformationsContext";
 import { Storage } from "../libs/Storage";
 import { hydrate } from "../libs/hydrate";
 import { SelectedInspectContext } from "../libs/SelectedInspectContext";
+import { postMessage, onMessage, offMessage } from "../../hook/postMessage";
 
 let uniqueIdCounter = 0;
 function getUniqueId(): number {
@@ -104,13 +105,13 @@ export function Layout(): React.ReactElement {
   );
 
   React.useEffect(() => {
-    function onMessage(event: MessageEvent): void {
-      if (event.data?.source !== MESSAGE_SOURCE_BACKGROUND) {
+    function listener(eventData: any): void {
+      if (eventData?.source !== MESSAGE_SOURCE_BACKGROUND) {
         return;
       }
       const data: FrameData & {
         type: "frame-connected" | "frame-disconnected";
-      } = event.data.payload;
+      } = eventData.payload;
       switch (data?.type) {
         case "frame-connected": {
           const { frameId, frameURL } = data;
@@ -139,7 +140,7 @@ export function Layout(): React.ReactElement {
                     setInspectFrameIndex(i);
                     Storage.setItem("inspectFrameIndex", i);
                     for (const frame of [{ frameId: 0 }].concat({ frameId })) {
-                      window.postMessage(
+                      postMessage(
                         {
                           source: MESSAGE_SOURCE_PANEL,
                           payload: {
@@ -148,12 +149,11 @@ export function Layout(): React.ReactElement {
                           },
                           frameId: frame.frameId,
                         },
-                        "*"
                       );
                     }
                   } else {
                     console.log("inspect frame", inspectFrameIndex, i);
-                    window.postMessage(
+                    postMessage(
                       {
                         source: MESSAGE_SOURCE_PANEL,
                         payload: {
@@ -161,19 +161,17 @@ export function Layout(): React.ReactElement {
                           active: inspectFrameIndex === i,
                         },
                         frameId: frameId,
-                      },
-                      "*"
+                      }
                     );
                   }
-                  window.postMessage(
+                  postMessage(
                     {
                       source: MESSAGE_SOURCE_PANEL,
                       payload: {
                         type: PANEL_CHANGE,
                         panel: selectedPanel,
                       },
-                    },
-                    "*"
+                    }
                   );
                 } else {
                   console.warn("page has no bricks!");
@@ -181,15 +179,14 @@ export function Layout(): React.ReactElement {
               }
             );
           } else {
-            window.postMessage(
+            postMessage(
               {
                 source: MESSAGE_SOURCE_PANEL,
                 payload: {
                   type: PANEL_CHANGE,
                   panel: selectedPanel,
                 },
-              },
-              "*"
+              }
             );
           }
           break;
@@ -210,8 +207,8 @@ export function Layout(): React.ReactElement {
         }
       }
     }
-    window.addEventListener("message", onMessage);
-    return (): void => window.removeEventListener("message", onMessage);
+    onMessage(listener);
+    return (): void => offMessage(listener);
   }, [
     inspectFrameIndex,
     selectedPanel,
@@ -219,53 +216,66 @@ export function Layout(): React.ReactElement {
     setTransformationsByFrameId,
   ]);
 
+  const spliceListLimit = (list: Array<any>, n: number): Array<any> =>  {
+    const spliceNumber = list.length - n;
+    if (list.length > 100) {
+      list.splice(0, spliceNumber);
+    }
+    return list;
+  }
+
   React.useEffect(() => {
-    function onMessage(event: MessageEvent): void {
+    function listener(eventData: any): void {
       let data: DehydratedPayload;
       if (
-        event.data?.source === MESSAGE_SOURCE_HOOK &&
-        ((data = event.data.payload), data?.type === "evaluation")
+        eventData?.source === MESSAGE_SOURCE_HOOK &&
+        // eventData.frameId === inspectFrameIndex &&
+        ((data = eventData.payload), data?.type === "evaluation")
       ) {
-        setEvaluationsByFrameId(event.data.frameId, (prev) =>
-          (prev ?? []).concat({
-            hydrated: false,
-            payload: data.payload,
-            repo: data.repo,
-            lowerRaw: data.payload.raw.toLowerCase(),
-            id: getUniqueId(),
-          })
+        setEvaluationsByFrameId(eventData.frameId, (prev) =>
+          {
+            const list = (prev ?? []).concat({
+              hydrated: false,
+              payload: data.payload,
+              repo: data.repo,
+              lowerRaw: data.payload.raw.toLowerCase(),
+              id: getUniqueId(),
+            });
+            return spliceListLimit(list, 100);
+          }
         );
       }
 
       if (
-        event.data?.source === MESSAGE_SOURCE_HOOK &&
-        ((data = event.data.payload), data?.type === "re-evaluation")
+        eventData?.source === MESSAGE_SOURCE_HOOK &&
+        // eventData.frameId === inspectFrameIndex &&
+        ((data = eventData.payload), data?.type === "re-evaluation")
       ) {
         const value = hydrate(data.payload, data.repo);
-        setEvaluationsByFrameId(event.data.frameId, (prev) => {
+        setEvaluationsByFrameId(eventData.frameId, (prev) => {
           const selected = prev.find((item) => item.id === value.id);
           if (selected) {
             selected.lowerRaw = value.detail.raw.toLowerCase();
             selected.detail = value.detail;
             selected.error = value.error;
-            return [...prev];
+            return spliceListLimit([...prev], 100);
           }
-          return prev;
+          return spliceListLimit(prev, 100);
         });
       }
     }
-    window.addEventListener("message", onMessage);
-    return (): void => window.removeEventListener("message", onMessage);
+    onMessage(listener);
+    return (): void => offMessage(listener);
   }, [setEvaluationsByFrameId]);
 
   React.useEffect(() => {
-    function onMessage(event: MessageEvent): void {
+    function listener(eventData: any): void {
       let data: DehydratedPayload;
       if (
-        event.data?.source === MESSAGE_SOURCE_HOOK &&
-        ((data = event.data.payload), data?.type === "transformation")
+        eventData?.source === MESSAGE_SOURCE_HOOK &&
+        ((data = eventData.payload), data?.type === "transformation")
       ) {
-        setTransformationsByFrameId(event.data.frameId, (prev) =>
+        setTransformationsByFrameId(eventData.frameId, (prev) =>
           (prev ?? []).concat({
             detail: hydrate(data.payload, data.repo),
             id: getUniqueId(),
@@ -274,11 +284,11 @@ export function Layout(): React.ReactElement {
       }
 
       if (
-        event.data?.source === MESSAGE_SOURCE_HOOK &&
-        ((data = event.data.payload), data?.type === "re-transformation")
+        eventData?.source === MESSAGE_SOURCE_HOOK &&
+        ((data = eventData.payload), data?.type === "re-transformation")
       ) {
         const value = hydrate(data.payload, data.repo);
-        setTransformationsByFrameId(event.data.frameId, (prev) => {
+        setTransformationsByFrameId(eventData.frameId, (prev) => {
           const selected = prev.find((item) => item.id === value.id);
           if (selected) {
             selected.detail = value.detail;
@@ -289,24 +299,24 @@ export function Layout(): React.ReactElement {
         });
       }
     }
-    window.addEventListener("message", onMessage);
-    return (): void => window.removeEventListener("message", onMessage);
+    onMessage(listener)
+    return (): void => window.removeEventListener("message", listener);
   }, [setTransformationsByFrameId]);
 
   React.useEffect(() => {
-    function onMessage(event: MessageEvent): void {
+    function listener(eventData: any): void {
       if (
         !preserveLogs &&
-        event.data?.source === MESSAGE_SOURCE_HOOK &&
-        event.data.payload?.type === "locationChange"
+        eventData?.source === MESSAGE_SOURCE_HOOK &&
+        eventData.payload?.type === "locationChange"
       ) {
-        const { frameId } = event.data;
+        const { frameId } = eventData;
         setEvaluationsByFrameId(frameId, []);
         setTransformationsByFrameId(frameId, []);
       }
     }
-    window.addEventListener("message", onMessage);
-    return (): void => window.removeEventListener("message", onMessage);
+    onMessage(listener);
+    return (): void => offMessage(listener);
   }, [preserveLogs, setEvaluationsByFrameId, setTransformationsByFrameId]);
 
   React.useEffect(() => {
@@ -387,7 +397,7 @@ export function Layout(): React.ReactElement {
     for (const frame of [{ frameId: 0 }].concat([
       ...framesRef.current.values(),
     ])) {
-      window.postMessage(
+      postMessage(
         {
           source: MESSAGE_SOURCE_PANEL,
           payload: {
@@ -396,13 +406,12 @@ export function Layout(): React.ReactElement {
           },
           frameId: frame.frameId,
         },
-        "*"
       );
     }
   }, [getFrameIdByFrameIndex, inspectFrameIndex]);
 
   React.useEffect(() => {
-    window.postMessage(
+    postMessage(
       {
         source: MESSAGE_SOURCE_PANEL,
         payload: {
@@ -410,7 +419,6 @@ export function Layout(): React.ReactElement {
           panel: selectedPanel,
         },
       },
-      "*"
     );
   }, [selectedPanel]);
 

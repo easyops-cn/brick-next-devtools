@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+message Message {
+  string source = 1;
+  string payload = 2;
+  optional int64 frameId = 3;
+}

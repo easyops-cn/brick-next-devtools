@@ -4,6 +4,7 @@ import { inspectElement, dismissInspections } from "./inspector";
 import { emit } from "./emit";
 import { overrideProps } from "./overrideProps";
 import { restoreDehydrated } from "./dehydrate";
+import { onMessage } from "./postMessage";
 
 function injectHook(): void {
   if (Object.prototype.hasOwnProperty.call(window, HOOK_NAME)) {
@@ -27,6 +28,7 @@ function injectHook(): void {
     // Methods below are exposed to Brick Next itself, keep compatible.
     emit,
     restoreDehydrated,
+    onMessage,
   };
 
   Object.defineProperty(hook, "pageHasBricks", {

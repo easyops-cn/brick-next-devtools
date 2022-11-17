@@ -1,3 +1,4 @@
+import { postMessage } from "./hook/postMessage";
 import {
   EVALUATION_EDIT,
   FRAME_ACTIVE_CHANGE,
@@ -40,9 +41,9 @@ function createPanelForBricks(): void {
         name: "" + tabId,
       });
 
-      function pushMessage(msg: unknown): void {
+      function pushMessage(msg: any): void {
         if (panelWindow) {
-          panelWindow?.postMessage(msg, "*");
+          postMessage(msg, panelWindow);
         } else {
           pendingMessages.push(msg);
         }
@@ -86,7 +87,8 @@ function createPanelForBricks(): void {
             panelWindow = win;
             panelWindow.addEventListener("message", onPanelMessage);
             for (const msg of pendingMessages) {
-              panelWindow.postMessage(msg, "*");
+              // panelWindow.postMessage(msg, "*");
+              postMessage(msg as any, panelWindow);
             }
             pendingMessages.length = 0;
           });
