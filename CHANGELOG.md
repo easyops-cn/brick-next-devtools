@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.7](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.6...v0.6.7) (2022-11-18)
+
+### Features
+
+- support limit log number ([a124f18](https://github.com/easyops-cn/brick-next-devtools/commit/a124f181793cda9a28c1d45da2690dc9ca9b0c9c))
+
 ### [0.6.6](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.5...v0.6.6) (2022-08-17)
 
 ### Features
