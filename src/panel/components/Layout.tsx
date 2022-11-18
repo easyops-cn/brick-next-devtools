@@ -41,6 +41,9 @@ export function Layout(): React.ReactElement {
   const [transformationsMap, setTransformationsMap] = React.useState<
     Record<number, Transformation[]>
   >({ 0: [] });
+  const [logNumber, setLogNumber] = React.useState(
+    Storage.getItem("logNumber") ?? 50
+  );
   const [preserveLogs, savePreserveLogs] = React.useState(false);
   const [inspectFrameIndex, setInspectFrameIndex] = React.useState<number>(
     () => Storage.getItem("inspectFrameIndex") ?? 0
@@ -219,21 +222,37 @@ export function Layout(): React.ReactElement {
     setTransformationsByFrameId,
   ]);
 
+  const spliceListLimit = (list: Array<any>, n: number): Array<any> => {
+    const spliceNumber = list.length - n;
+    if (list.length > n) {
+      list.splice(0, spliceNumber);
+    }
+    return list;
+  };
+
   React.useEffect(() => {
     function onMessage(event: MessageEvent): void {
+      if (
+        selectedPanel !== "Evaluations" ||
+        getFrameIdByFrameIndex(inspectFrameIndex) !== event.data?.frameId
+      )
+        return;
       let data: DehydratedPayload;
       if (
         event.data?.source === MESSAGE_SOURCE_HOOK &&
         ((data = event.data.payload), data?.type === "evaluation")
       ) {
         setEvaluationsByFrameId(event.data.frameId, (prev) =>
-          (prev ?? []).concat({
-            hydrated: false,
-            payload: data.payload,
-            repo: data.repo,
-            lowerRaw: data.payload.raw.toLowerCase(),
-            id: getUniqueId(),
-          })
+          spliceListLimit(
+            (prev ?? []).concat({
+              hydrated: false,
+              payload: data.payload,
+              repo: data.repo,
+              lowerRaw: data.payload.raw.toLowerCase(),
+              id: getUniqueId(),
+            }),
+            logNumber
+          )
         );
       }
 
@@ -256,7 +275,7 @@ export function Layout(): React.ReactElement {
     }
     window.addEventListener("message", onMessage);
     return (): void => window.removeEventListener("message", onMessage);
-  }, [setEvaluationsByFrameId]);
+  }, [inspectFrameIndex, selectedPanel, logNumber, setEvaluationsByFrameId]);
 
   React.useEffect(() => {
     function onMessage(event: MessageEvent): void {
@@ -350,6 +369,8 @@ export function Layout(): React.ReactElement {
       savePreserveLogs,
       evaluations: evaluationsMap[inspectFrameId] ?? [],
       setEvaluations,
+      logNumber,
+      setLogNumber,
     };
   }, [
     evaluationsMap,
@@ -357,6 +378,8 @@ export function Layout(): React.ReactElement {
     inspectFrameIndex,
     preserveLogs,
     setEvaluations,
+    logNumber,
+    setLogNumber,
   ]);
 
   const setTransformations = React.useCallback(

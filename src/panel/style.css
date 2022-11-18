@@ -92,6 +92,15 @@ body {
   align-items: center;
 }
 
+.toolbar--group-log-number-input {
+  display: flex;
+  align-items: center;
+}
+
+.toolbar--group-log-number-input > label {
+  margin-right: 4px;
+}
+
 .toolbar-group > *:not(:last-child) {
   margin-right: 10px;
 }
