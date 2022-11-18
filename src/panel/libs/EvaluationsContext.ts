@@ -6,6 +6,8 @@ export interface ContextOfEvaluations {
   setEvaluations?: React.Dispatch<React.SetStateAction<LazyEvaluation[]>>;
   preserveLogs?: boolean;
   savePreserveLogs?: React.Dispatch<React.SetStateAction<boolean>>;
+  logNumber?: number;
+  setLogNumber?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export const EvaluationsContext = React.createContext<ContextOfEvaluations>({});

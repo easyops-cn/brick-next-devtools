@@ -28,6 +28,8 @@ export function EvaluationsPanel(): React.ReactElement {
     setEvaluations,
     preserveLogs,
     savePreserveLogs,
+    logNumber,
+    setLogNumber,
   } = useEvaluationsContext();
   const [stringWrap, setStringWrap] = React.useState(false);
   const [q, setQ] = React.useState<string>();
@@ -146,6 +148,21 @@ export function EvaluationsPanel(): React.ReactElement {
           />
         </div>
         <div className="toolbar-group">
+          <div className="toolbar--group-log-number-input">
+            <label>Log number:</label>
+            <InputGroup
+              type="number"
+              value={String(logNumber)}
+              style={{
+                width: 100,
+              }}
+              onChange={(e) => {
+                LocalJsonStorage.setItem("logNumber", Number(e.target.value));
+                setPage(1);
+                setLogNumber(Number(e.target.value) ?? 0);
+              }}
+            />
+          </div>
           <Switch
             checked={preserveLogs}
             label="Preserve logs"

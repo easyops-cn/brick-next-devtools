@@ -98,7 +98,7 @@ describe("EvaluationsPanel", () => {
 
   it("should handle filter", () => {
     const wrapper = shallow(<EvaluationsPanel />);
-    wrapper.find(InputGroup).invoke("onChange")({
+    wrapper.find(InputGroup).at(0).invoke("onChange")({
       target: {
         value: "detail",
       },
