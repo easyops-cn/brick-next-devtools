@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.8](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.7...v0.6.8) (2023-06-28)
+
+### Features
+
+- support brick next v3 ([da474a2](https://github.com/easyops-cn/brick-next-devtools/commit/da474a2bd1e4f7ff0960bd2aeb9b171b3026582b))
+
 ### [0.6.7](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.6...v0.6.7) (2022-11-18)
 
 ### Features
