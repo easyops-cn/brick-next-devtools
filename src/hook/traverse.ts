@@ -9,6 +9,12 @@ import {
 } from "../shared/interfaces";
 import { dehydrate } from "./dehydrate";
 
+function isV3OrAbove(): boolean {
+  const { "brick-container": version } =
+    (window as any).BRICK_NEXT_VERSIONS ?? {};
+  return Number(version?.split(".")[0] ?? 2) >= 3;
+}
+
 let uniqueIdCounter = 0;
 function uniqueId(): number {
   return (uniqueIdCounter += 1);
@@ -69,8 +75,31 @@ export function getBrickInfo(uid: number): DehydratedBrickInfo {
 }
 
 function getBricksByMountPoint(mountPoint: string): RichBrickData[] {
-  const element = document.querySelector(mountPoint) as MountPointElement;
-  return (element?.$$rootBricks?.map(walk) ?? []).filter(Boolean);
+  const element = document.querySelector(mountPoint);
+  if (isV3OrAbove()) {
+    return element ? [...element.children].map(traverseV3).filter(Boolean) : [];
+  }
+  return ((element as MountPointElement)?.$$rootBricks?.map(walk) ?? []).filter(
+    Boolean
+  );
+}
+
+function traverseV3(element: Element): RichBrickData {
+  if (!element || !(element as HTMLElement).dataset?.iid) {
+    return;
+  }
+
+  const uid = uniqueId();
+  uidToBrick.set(uid, element as BrickElement);
+  // brickToUid.set(element, uid);
+  const tagName = element.tagName.toLowerCase();
+
+  return {
+    uid,
+    tagName,
+    invalid: tagName.includes("-") && !customElements.get(tagName),
+    children: [...element.children].map(traverseV3).filter(Boolean),
+  };
 }
 
 function walk(node: BrickNode): RichBrickData {
@@ -96,6 +125,10 @@ function walk(node: BrickNode): RichBrickData {
 }
 
 function isBrickElement(element: Element): element is BrickElement {
+  if (isV3OrAbove()) {
+    const tagName = element.tagName.toLowerCase();
+    return !!customElements.get(tagName);
+  }
   return ["brick", "provider", "custom-template"].includes(
     (element as BrickElement).$$typeof
   );
