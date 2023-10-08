@@ -31,6 +31,7 @@ const tagsToDisplay: [keyof BrickInfo, string][] = [
   ["nativeProperties", "native properties"],
   ["properties", "properties"],
   ["events", "events"],
+  ["tplState", "template state"],
 ];
 
 export function PropView(): React.ReactElement {

@@ -22,9 +22,10 @@ import {
   PANEL_CHANGE,
 } from "../../shared/constants";
 import { TransformationsContext } from "../libs/TransformationsContext";
-import { Storage } from "../libs/Storage";
+import { LocalJsonStorage, Storage } from "../libs/Storage";
 import { hydrate } from "../libs/hydrate";
 import { SelectedInspectContext } from "../libs/SelectedInspectContext";
+import { ContextPanel } from "./ContextPanel";
 
 let uniqueIdCounter = 0;
 function getUniqueId(): number {
@@ -42,7 +43,7 @@ export function Layout(): React.ReactElement {
     Record<number, Transformation[]>
   >({ 0: [] });
   const [logNumber, setLogNumber] = React.useState(
-    Storage.getItem("logNumber") ?? 50
+    LocalJsonStorage.getItem("logNumber") ?? 50
   );
   const [preserveLogs, savePreserveLogs] = React.useState(false);
   const [inspectFrameIndex, setInspectFrameIndex] = React.useState<number>(
@@ -275,7 +276,13 @@ export function Layout(): React.ReactElement {
     }
     window.addEventListener("message", onMessage);
     return (): void => window.removeEventListener("message", onMessage);
-  }, [inspectFrameIndex, selectedPanel, logNumber, setEvaluationsByFrameId]);
+  }, [
+    inspectFrameIndex,
+    selectedPanel,
+    logNumber,
+    setEvaluationsByFrameId,
+    getFrameIdByFrameIndex,
+  ]);
 
   React.useEffect(() => {
     function onMessage(event: MessageEvent): void {
@@ -454,6 +461,8 @@ export function Layout(): React.ReactElement {
               <TransformationsContext.Provider value={transformationsCtx}>
                 <TransformationsPanel />
               </TransformationsContext.Provider>
+            ) : selectedPanel === "Context" ? (
+              <ContextPanel />
             ) : (
               <BricksPanel />
             )}

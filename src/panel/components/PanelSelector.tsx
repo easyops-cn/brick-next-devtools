@@ -19,7 +19,7 @@ export function PanelSelector({
       {
         <HTMLSelect
           value={selectedPanel}
-          options={["Bricks", "Evaluations", "Transformations"]}
+          options={["Bricks", "Context", "Evaluations", "Transformations"]}
           onChange={handleChange}
           minimal
         />
