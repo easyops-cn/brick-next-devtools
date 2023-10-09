@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.9](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.8...v0.6.9) (2023-10-09)
+
+### Features
+
+- inspect page context and template state ([23cc256](https://github.com/easyops-cn/brick-next-devtools/commit/23cc2564b16d7d0337cd962232e232d150fd566a))
+
 ### [0.6.8](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.7...v0.6.8) (2023-06-28)
 
 ### Features
