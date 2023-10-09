@@ -6,12 +6,12 @@ import {
   RichBrickData,
   MountPointElement,
   BrickNode,
+  BrickInfo,
 } from "../shared/interfaces";
 import { dehydrate } from "./dehydrate";
 
 function isV3OrAbove(): boolean {
-  const { "brick-container": version } =
-    (window as any).BRICK_NEXT_VERSIONS ?? {};
+  const { "brick-container": version } = window.BRICK_NEXT_VERSIONS ?? {};
   return Number(version?.split(".")[0] ?? 2) >= 3;
 }
 
@@ -41,6 +41,7 @@ export function getBrickInfo(uid: number): DehydratedBrickInfo {
   const nativeProperties: Record<string, any> = {};
   let properties: Record<string, any> = {};
   let events: [string, any][] = [];
+  let tplState: Record<string, unknown> | undefined;
   const element = uidToBrick.get(uid);
   if (element) {
     if (element.id) {
@@ -51,6 +52,13 @@ export function getBrickInfo(uid: number): DehydratedBrickInfo {
     }
     if (element.slot) {
       nativeProperties.slot = element.slot;
+    }
+    if (element.tagName.includes(".TPL-")) {
+      const tplContextId =
+        element.dataset[isV3OrAbove() ? "tplStateStoreId" : "tplContextId"];
+      if (tplContextId) {
+        tplState = getContext(tplContextId);
+      }
     }
     if (isBrickElement(element)) {
       const props: string[] =
@@ -70,7 +78,11 @@ export function getBrickInfo(uid: number): DehydratedBrickInfo {
     }
   }
   const repo: any[] = [];
-  const info = dehydrate({ nativeProperties, properties, events }, repo);
+  const originalInfo: BrickInfo = { nativeProperties, properties, events };
+  if (tplState) {
+    originalInfo.tplState = tplState;
+  }
+  const info = dehydrate(originalInfo, repo);
   return { info, repo };
 }
 
@@ -169,4 +181,28 @@ function findUsedBricks(
     ];
   }
   return [];
+}
+
+export function getContext(
+  tplContextId?: string
+): Record<string, unknown> | null {
+  if (
+    isV3OrAbove() &&
+    typeof window.__dev_only_getAllContextValues === "function"
+  ) {
+    return window.__dev_only_getAllContextValues({
+      tplStateStoreId: tplContextId,
+    });
+  }
+
+  const { dll } = window;
+  if (typeof dll === "function") {
+    return Object.fromEntries(
+      [...dll("tYg3").developHelper.getAllContextValues({ tplContextId })]
+        .map(([key, { value }]) => [key, value])
+        .sort(([k1], [k2]) => (k1 > k2 ? 1 : -1))
+    );
+  }
+
+  return null;
 }

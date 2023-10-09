@@ -5,7 +5,7 @@ import {
   DehydratedBrickInfo,
 } from "../shared/interfaces";
 
-customElements.define("your.awesome-tpl", class Tmp1 extends HTMLElement {});
+customElements.define("your.tpl-awesome", class Tmp1 extends HTMLElement {});
 customElements.define("your.inner-brick", class Tmp1 extends HTMLElement {});
 customElements.define(
   "your.awesome-provider",
@@ -15,6 +15,16 @@ customElements.define(
   "your.another-provider",
   class Tmp1 extends HTMLElement {}
 );
+
+(global as any).dll = () => {
+  return {
+    developHelper: {
+      getAllContextValues() {
+        return new Map([["myState", "myStateValue"]]);
+      },
+    },
+  };
+};
 
 describe("traverse", () => {
   beforeEach(() => {
@@ -30,7 +40,6 @@ describe("traverse", () => {
 
     const BrickProto = {
       constructor: {
-        // eslint-disable-next-line @typescript-eslint/camelcase
         _dev_only_definedProperties: ["propA", "propB"],
       },
     };
@@ -48,12 +57,15 @@ describe("traverse", () => {
       {
         $$brick: {
           element: Object.assign(Object.create(BrickProto), {
-            tagName: "YOUR.AWESOME-TPL",
+            tagName: "YOUR.TPL-AWESOME",
             $$typeof: "custom-template",
             propB: "b in tpl",
             propA: "a in tpl",
             id: "tpl-1",
             $$eventListeners: [],
+            dataset: {
+              tplContextId: "tpl-context-1",
+            },
           }),
         },
         children: [
@@ -142,7 +154,7 @@ describe("traverse", () => {
       main: [
         {
           uid: 1,
-          tagName: "your.awesome-tpl",
+          tagName: "your.tpl-awesome",
           invalid: false,
           children: [
             {
@@ -205,7 +217,7 @@ describe("traverse", () => {
       repo: [],
     };
 
-    expect(getBrickByUid(1).tagName).toBe("YOUR.AWESOME-TPL");
+    expect(getBrickByUid(1).tagName).toBe("YOUR.TPL-AWESOME");
 
     expect(getBrickInfo(1)).toEqual({
       info: {
@@ -217,6 +229,13 @@ describe("traverse", () => {
           propB: "b in tpl",
         },
         events: [],
+        tplState: {
+          myState: {
+            $$brickNextDevtoolsDehydrated: {
+              type: "undefined",
+            },
+          },
+        },
       },
       repo: [],
     });

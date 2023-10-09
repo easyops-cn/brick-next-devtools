@@ -47,6 +47,7 @@ export interface BrickInfo {
   nativeProperties?: Record<string, any>;
   properties?: Record<string, any>;
   events?: [string, any][];
+  tplState?: Record<string, any>;
 }
 
 export type BrowserTheme = "dark" | "light";
@@ -124,4 +125,8 @@ export interface FrameData {
   frameURL: string;
 }
 
-export type PanelType = "Bricks" | "Evaluations" | "Transformations";
+export type PanelType =
+  | "Bricks"
+  | "Context"
+  | "Evaluations"
+  | "Transformations";
