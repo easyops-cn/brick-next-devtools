@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.10](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.9...v0.6.10) (2023-10-10)
+
+### Bug Fixes
+
+- refresh brick info ([fda903d](https://github.com/easyops-cn/brick-next-devtools/commit/fda903d58aad7fb91fa3da0829530e1d9b2725c8))
+
 ### [0.6.9](https://github.com/easyops-cn/brick-next-devtools/compare/v0.6.8...v0.6.9) (2023-10-09)
 
 ### Features
