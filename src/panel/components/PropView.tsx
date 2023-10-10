@@ -124,7 +124,7 @@ export function PropView(): React.ReactElement {
                 <PropList
                   list={brickInfo[key]}
                   overrideProps={overrideProps}
-                  editable={key !== "events"}
+                  editable={key !== "events" && key !== "tplState"}
                 />
               </div>
             </React.Fragment>

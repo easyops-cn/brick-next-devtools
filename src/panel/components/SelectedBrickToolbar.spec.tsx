@@ -6,7 +6,11 @@ import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
 
 jest.mock("../libs/SelectedBrickContext");
 
-(useSelectedBrickContext as jest.Mock).mockReturnValue({ selectedBrick: null });
+const setSelectedBrick = jest.fn();
+(useSelectedBrickContext as jest.Mock).mockReturnValue({
+  selectedBrick: null,
+  setSelectedBrick,
+});
 
 const mockEval = jest.fn();
 
@@ -33,20 +37,29 @@ describe("SelectedBrickToolbar", () => {
       uid: 1,
       tagName: "your.awesome-brick",
     };
-    (useSelectedBrickContext as jest.Mock).mockReturnValue({ selectedBrick });
+    (useSelectedBrickContext as jest.Mock).mockReturnValue({
+      selectedBrick,
+      setSelectedBrick,
+    });
 
     const wrapper = shallow(<SelectedBrickToolbar />);
 
     expect(wrapper.find(".brick-title").text()).toBe("your.awesome-brick");
 
     wrapper.find(Button).at(0).invoke("onClick")(null);
+    expect(setSelectedBrick).toBeCalledWith({
+      uid: 1,
+      tagName: "your.awesome-brick",
+    });
+
+    wrapper.find(Button).at(1).invoke("onClick")(null);
     expect(mockEval).toHaveBeenNthCalledWith(
       1,
       "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(1));",
       {}
     );
 
-    wrapper.find(Button).at(1).invoke("onClick")(null);
+    wrapper.find(Button).at(2).invoke("onClick")(null);
     expect(mockEval).toHaveBeenNthCalledWith(
       2,
       "inspect(window.__BRICK_NEXT_DEVTOOLS_HOOK__.getBrickByUid(1).constructor);",

@@ -6,7 +6,7 @@ import { useSelectedBrickContext } from "../libs/SelectedBrickContext";
 import { useEvalOptions } from "../libs/useEvalOptions";
 
 export function SelectedBrickToolbar(): React.ReactElement {
-  const { selectedBrick } = useSelectedBrickContext();
+  const { selectedBrick, setSelectedBrick } = useSelectedBrickContext();
   const evalOptions = useEvalOptions();
 
   const handleInspectElement = React.useCallback((): void => {
@@ -23,6 +23,10 @@ export function SelectedBrickToolbar(): React.ReactElement {
     );
   }, [evalOptions, selectedBrick]);
 
+  const handleRefreshBrickInfo = React.useCallback(() => {
+    setSelectedBrick({ ...selectedBrick });
+  }, [selectedBrick, setSelectedBrick]);
+
   return (
     <div className="selected-brick-toolbar">
       {selectedBrick && (
@@ -36,6 +40,9 @@ export function SelectedBrickToolbar(): React.ReactElement {
             {selectedBrick.tagName}
           </span>
           <ButtonGroup>
+            <Tooltip content="Refresh brick info" hoverOpenDelay={300}>
+              <Button icon="refresh" minimal onClick={handleRefreshBrickInfo} />
+            </Tooltip>
             <Tooltip content="Inspect the brick element" hoverOpenDelay={300}>
               <Button icon="eye-open" minimal onClick={handleInspectElement} />
             </Tooltip>
